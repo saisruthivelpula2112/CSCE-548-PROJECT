@@ -25,7 +25,7 @@ The project shows how to:
 ---
 
 ## Repository Structure
-text
+'''text
 CSCE-548-PROJECT/
 │
 ├── sql/
@@ -38,7 +38,7 @@ CSCE-548-PROJECT/
 │   └── run_crud.py
 │
 ├── .gitignore
-└── README.md
+└── README.md '''
 
 
 
