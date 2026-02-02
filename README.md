@@ -37,7 +37,7 @@ CSCE-548-PROJECT/
 │
 ├── .gitignore
 └── README.md
-
+-------
 ## Setup Instructions
 
 ### 1. Install Required Software
