@@ -101,6 +101,44 @@ Make sure the following are installed on your system:
 From the project root directory:
 ```bash
 pip install psycopg2-binary
+-----
+---
+
+## How to Run
+
+All commands must be executed from the **project root directory** (CSCE-548-PROJECT).
+
+### List users
+```bash
+python -m src.run_crud --list
+```
+
+### Add a user
+```bash
+python -m src.run_crud --add alice alice@uni.edu student
+```
+
+---
+
+## Screenshots
+
+The following screenshots demonstrate the working of the project:
+
+- PostgreSQL database and tables created in **pgAdmin**
+- Successful execution of `schema.sql`
+- Successful execution of `seed.sql`
+- Output of `--list` command showing users
+- Output of `--add` command adding a new user
+
+Screenshots were taken during execution and are included for verification.
+
+---
+
+## GitHub Repository
+
+Project source code is available at:  
+https://github.com/saisruthivelpula2112/CSCE-548-PROJECT
+
 
    
 
