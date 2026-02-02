@@ -37,65 +37,26 @@ CSCE-548-PROJECT/
 │
 ├── .gitignore
 └── README.md
--------
+
+
+
+---
+
 ## Setup Instructions
 
 ### 1. Install Required Software
-Make sure the following software is installed on your system:
+Make sure the following are installed on your system:
 
-- PostgreSQL 17  
-- pgAdmin 4  
-- Python 3.13  
-- Visual Studio Code  
-
----
-
-### 2. Create the Database
-1. Open **pgAdmin**
-2. Create a new database named:## Setup Instructions
-
-### 1. Install Required Software
-Make sure the following software is installed on your system:
-
-- PostgreSQL 17  
-- pgAdmin 4  
-- Python 3.13  
-- Visual Studio Code  
+- PostgreSQL 17
+- pgAdmin 4
+- Python 3.13
+- Visual Studio Code
 
 ---
 
 ### 2. Create the Database
 1. Open **pgAdmin**
-2. Create a new database named:csce548_project1
-
----
-
-### 3. Create Tables
-1. Open the file `sql/schema.sql`
-2. Copy its contents
-3. Paste and run it in **pgAdmin → Query Tool**
-4. This creates all required tables:
-- users  
-- projects  
-- items  
-- tags  
-- item_tags  
-
----
-
-### 4. Insert Seed Data
-1. Open the file `sql/seed.sql`
-2. Copy its contents
-3. Paste and run it in **pgAdmin → Query Tool**
-4. This inserts initial users and related data
-
----
-
-### 5. Install Python Dependencies
-From the project root directory, run:
-```bash
-pip install psycopg2-binary
-
+2. Create a new database named:
 
 
 
