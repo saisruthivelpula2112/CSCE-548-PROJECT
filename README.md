@@ -23,7 +23,7 @@ The project shows how to:
 - Visual Studio Code
 
 ---
-```text
+## Repository Structure
 CSCE-548-PROJECT/
 ├── sql/
 │   ├── schema.sql
