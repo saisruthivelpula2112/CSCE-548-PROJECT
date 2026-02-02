@@ -28,13 +28,13 @@ The project shows how to:
 CSCE-548-PROJECT/
 │
 ├── sql/
-│ ├── schema.sql
-│ └── seed.sql
+│   ├── schema.sql
+│   └── seed.sql
 │
 ├── src/
-│ ├── init.py
-│ ├── db.py
-│ └── run_crud.py
+│   ├── __init__.py
+│   ├── db.py
+│   └── run_crud.py
 │
 ├── .gitignore
 └── README.md
