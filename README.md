@@ -38,57 +38,68 @@ CSCE-548-PROJECT/
 ├── .gitignore
 └── README.md
 
----
-
 ## Setup Instructions
 
 ### 1. Install Required Software
-Make sure the following are installed on your system:
-- PostgreSQL 17
-- pgAdmin 4
-- Python 3.13
-- Visual Studio Code
+Make sure the following software is installed on your system:
+
+- PostgreSQL 17  
+- pgAdmin 4  
+- Python 3.13  
+- Visual Studio Code  
+
+---
+
+### 2. Create the Database
+1. Open **pgAdmin**
+2. Create a new database named:## Setup Instructions
+
+### 1. Install Required Software
+Make sure the following software is installed on your system:
+
+- PostgreSQL 17  
+- pgAdmin 4  
+- Python 3.13  
+- Visual Studio Code  
+
+---
 
 ### 2. Create the Database
 1. Open **pgAdmin**
 2. Create a new database named:csce548_project1
 
+---
+
 ### 3. Create Tables
-1. Open `sql/schema.sql`
-2. Run the script in **pgAdmin → Query Tool**
-3. This creates all required tables (users, projects, items, tags, item_tags)
+1. Open the file `sql/schema.sql`
+2. Copy its contents
+3. Paste and run it in **pgAdmin → Query Tool**
+4. This creates all required tables:
+- users  
+- projects  
+- items  
+- tags  
+- item_tags  
+
+---
 
 ### 4. Insert Seed Data
-1. Open `sql/seed.sql`
-2. Run the script in **pgAdmin → Query Tool**
-3. This inserts initial users and related data
-
-### 5. Python Dependencies
-Install the PostgreSQL driver:pip install psycopg2-binary
+1. Open the file `sql/seed.sql`
+2. Copy its contents
+3. Paste and run it in **pgAdmin → Query Tool**
+4. This inserts initial users and related data
 
 ---
 
-
-2. Run the schema script:
-- Open `sql/schema.sql`
-- Execute it in **pgAdmin → Query Tool**
-
-3. Insert seed data:
-- Open `sql/seed.sql`
-- Execute it in **pgAdmin → Query Tool**
-
----
-
-## How to Run
-
-All commands must be executed from the project root directory.
-
-### List users
+### 5. Install Python Dependencies
+From the project root directory, run:
 ```bash
-python -m src.run_crud --list
+pip install psycopg2-binary
 
-## Add a user
-python -m src.run_crud --add alice alice@uni.edu student
+
+
+
+
 
 
 
