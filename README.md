@@ -24,6 +24,7 @@ The project shows how to:
 
 ---
 ## Repository Structure
+```text
 CSCE-548-PROJECT/
 ├── sql/
 │   ├── schema.sql
@@ -36,3 +37,4 @@ CSCE-548-PROJECT/
 │
 ├── .gitignore
 └── README.md
+
