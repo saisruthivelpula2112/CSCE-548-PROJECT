@@ -1,25 +1,40 @@
 # CSCE 548 – Project 1
 
 ## Project Overview
-This project demonstrates basic database design and interaction using PostgreSQL and Python.
-The goal is to create a relational database, populate it with data, and interact with it
-using Python code.
+This project demonstrates a PostgreSQL-backed application using Python.
+It includes database schema creation, seed data insertion, and Python-based
+CRUD operations on a `users` table.
 
-The project includes:
-- A PostgreSQL database schema
-- Sample seed data
-- Python code to connect to the database
-- Python commands to list users and add new users
+The project shows how to:
+- Design a relational database schema
+- Load initial data into PostgreSQL
+- Connect Python to PostgreSQL
+- List users from the database
+- Add new users via a command-line interface
 
 ---
 
 ## Technologies Used
 - PostgreSQL 17
 - pgAdmin 4
-- Python 3
+- Python 3.13
 - psycopg2-binary
 - GitHub
+- Visual Studio Code
 
 ---
 
 ## Repository Structure
+CSCE-548-PROJECT/
+│
+├── sql/
+│ ├── schema.sql
+│ └── seed.sql
+│
+├── src/
+│ ├── init.py
+│ ├── db.py
+│ └── run_crud.py
+│
+├── .gitignore
+└── README.md
