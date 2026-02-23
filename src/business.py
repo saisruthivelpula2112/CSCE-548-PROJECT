@@ -1,22 +1,36 @@
-from .run_crud import add_user, list_users, update_user_email, delete_user
+# src/business.py
+from typing import List, Dict, Optional
+from . import db   # relative import — run service as a package (uvicorn src.service:app)
 
 
-# Business layer wraps data layer
-
-def create_user(username, email, role):
-    # Example business rule
-    if not username or not email:
-        raise ValueError("Username and email are required")
-    return add_user(username, email, role)
+def get_all_users() -> List[Dict]:
+    """Return all users (delegates to db layer)."""
+    return db.get_all_users()
 
 
-def get_all_users():
-    return list_users()
+def get_user(username: str) -> Optional[Dict]:
+    """Return single user by username or None."""
+    if not username:
+        raise ValueError("username is required")
+    return db.get_user_by_username(username)
 
 
-def update_user(username, new_email):
-    return update_user_email(username, new_email)
+def create_user(username: str, email: str, role: str = "student") -> Dict:
+    """Validate then create a user."""
+    if not username:
+        raise ValueError("username is required")
+    if not email:
+        raise ValueError("email is required")
+    return db.create_user(username, email, role)
 
 
-def remove_user(username):
-    return delete_user(username)
+def delete_user_by_username(username: str) -> bool:
+    if not username:
+        raise ValueError("username is required")
+    return db.delete_user(username)
+
+
+def update_user_email_by_username(username: str, new_email: str) -> bool:
+    if not username or not new_email:
+        raise ValueError("username and new_email are required")
+    return db.update_user_email_by_username(username, new_email)

@@ -1,104 +1,74 @@
 # src/run_crud.py
-import argparse
-from src.db import get_connection
+import requests
+import time
 
-# ---------- CREATE ----------
-def add_user(username, email, role):
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute(
-        "INSERT INTO users (username, email, role) VALUES (%s, %s, %s);",
-        (username, email, role)
-    )
-    conn.commit()
-    cur.close()
-    conn.close()
+BASE_URL = "http://127.0.0.1:9000"
 
-# ---------- READ ----------
-def list_users():
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM users;")
-    rows = cur.fetchall()
-    print("Users:")
-    for row in rows:
-        print(row)
-    cur.close()
-    conn.close()
+def safe_print_response(resp):
+    print(f"Status: {resp.status_code}")
+    ct = resp.headers.get("content-type", "")
+    print(f"Content-Type: {ct}")
+    try:
+        print("JSON response:")
+        print(resp.json())
+    except Exception:
+        print("Raw response:")
+        print(resp.text[:1000])
 
-# ---------- UPDATE ----------
+
+def get_users():
+    print("\n--- Getting users ---")
+    try:
+        resp = requests.get(f"{BASE_URL}/users", timeout=5)
+        safe_print_response(resp)
+    except requests.RequestException as e:
+        print("Request error:", e)
+
+
+def create_user(username, email, role="student"):
+    print("\n--- Creating user ---")
+    payload = {"username": username, "email": email, "role": role}
+    try:
+        resp = requests.post(f"{BASE_URL}/users", json=payload, timeout=5)
+        safe_print_response(resp)
+    except requests.RequestException as e:
+        print("Request error:", e)
+
+
+def get_user(username):
+    print("\n--- Getting single user ---")
+    try:
+        resp = requests.get(f"{BASE_URL}/users/{username}", timeout=5)
+        safe_print_response(resp)
+    except requests.RequestException as e:
+        print("Request error:", e)
+
+
 def update_user_email(username, new_email):
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute(
-        "UPDATE users SET email = %s WHERE username = %s;",
-        (new_email, username)
-    )
-    conn.commit()
-    cur.close()
-    conn.close()
+    print("\n--- Updating user email ---")
+    try:
+        resp = requests.put(f"{BASE_URL}/users", params={"username": username, "new_email": new_email}, timeout=5)
+        safe_print_response(resp)
+    except requests.RequestException as e:
+        print("Request error:", e)
 
-# ---------- DELETE ----------
+
 def delete_user(username):
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute(
-        "DELETE FROM users WHERE username = %s;",
-        (username,)
-    )
-    conn.commit()
-    cur.close()
-    conn.close()
+    print("\n--- Deleting user ---")
+    try:
+        resp = requests.delete(f"{BASE_URL}/users", params={"username": username}, timeout=5)
+        safe_print_response(resp)
+    except requests.RequestException as e:
+        print("Request error:", e)
 
-# ---------- CLI ----------
-def main():
-    parser = argparse.ArgumentParser(description="CSCE 548 User CRUD CLI")
-
-    group = parser.add_mutually_exclusive_group()
-
-    group.add_argument("--list", action="store_true", help="List all users")
-
-    group.add_argument(
-        "--add",
-        nargs=3,
-        metavar=("USERNAME", "EMAIL", "ROLE"),
-        help="Add a user"
-    )
-
-    group.add_argument(
-        "--update-email",
-        nargs=2,
-        metavar=("USERNAME", "NEW_EMAIL"),
-        help="Update a user's email"
-    )
-
-    group.add_argument(
-        "--delete",
-        metavar="USERNAME",
-        help="Delete a user"
-    )
-
-    args = parser.parse_args()
-
-    if args.list:
-        list_users()
-
-    elif args.add:
-        username, email, role = args.add
-        add_user(username, email, role)
-        print(f"Added user {username}")
-
-    elif args.update_email:
-        username, new_email = args.update_email
-        update_user_email(username, new_email)
-        print(f"Updated email for {username}")
-
-    elif args.delete:
-        delete_user(args.delete)
-        print(f"Deleted user {args.delete}")
-
-    else:
-        list_users()
 
 if __name__ == "__main__":
-    main()
+    # small demo sequence
+    get_users()
+    username = f"console_user_{int(time.time()) % 100000}"
+    create_user(username, f"{username}@uni.edu")
+    get_user(username)
+    update_user_email(username, f"{username}+updated@uni.edu")
+    get_user(username)
+    delete_user(username)
+    get_users()
