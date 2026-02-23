@@ -140,20 +140,27 @@ Project source code is available at:
 https://github.com/saisruthivelpula2112/CSCE-548-PROJECT
 
 ---
+---
 
 # **Project Overview**
-CSCE 548 – Project 2
 
-Business Layer + Service Layer + Console Client Implementation
+CSCE 548 – Project 2  
+Business Layer + Service Layer + Console Client Implementation  
+
 This project extends Project 1 by introducing a structured, layered architecture that separates responsibilities across:
 
-Data Layer (PostgreSQL interaction)
-
-Business Layer (validation and business logic)
-
-Service Layer (REST API using FastAPI)
-
-Console Client (service tester)
+- Data Layer (PostgreSQL interaction)  
+- Business Layer (validation and business logic)  
+- Service Layer (REST API using FastAPI)  
+- Console Client (service tester)  
 
 The goal of this project is to model a professional-grade service-oriented architecture in which business logic and service endpoints invoke the database layer without directly exposing database access to clients.
 
+This project demonstrates:
+
+- Clean separation of concerns  
+- Abstraction of business rules  
+- Microservice-style REST API design  
+- End-to-end CRUD testing  
+
+---
