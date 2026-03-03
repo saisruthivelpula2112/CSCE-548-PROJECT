@@ -385,3 +385,169 @@ This project demonstrates:
 All layers integrate successfully and function correctly.
 
 ---
+# CSCE-548 Project 3 — Frontend Client
+
+A browser-based frontend client for the CSCE-548 REST API service layer built in Project 2.
+
+## Overview
+
+This project implements a full-stack web application with:
+- **Frontend**: Single-page HTML/JavaScript client hosted via Python HTTP server
+- **Backend**: FastAPI REST API with PostgreSQL database
+- **Coverage**: Full CRUD operations across all 5 database tables
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | HTML5, Vanilla JavaScript (fetch API) |
+| Service Layer | FastAPI + Uvicorn (port 9000) |
+| Business Layer | Python (business.py) |
+| Data Layer | PostgreSQL + psycopg2 |
+| Frontend Host | Python HTTP Server (port 8000) |
+
+## Database Tables
+
+- **users** — user_id, username, email, role
+- **projects** — project_id, owner_id, title
+- **items** — item_id, project_id, name
+- **tags** — tag_id, tag_name
+- **item_tags** — item_id, tag_id (junction table)
+
+## API Endpoints
+
+### Users
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | /users | Get all users |
+| GET | /users/{user_id} | Get single user |
+| POST | /users | Create user |
+| PUT | /users/{user_id} | Update user |
+| DELETE | /users/{user_id} | Delete user |
+
+### Projects
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | /projects | Get all projects |
+| GET | /projects/{project_id} | Get single project |
+| GET | /projects/owner/{owner_id} | Get projects by owner (subset) |
+| POST | /projects | Create project |
+| DELETE | /projects/{project_id} | Delete project |
+
+### Items
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | /items | Get all items |
+| GET | /items/{item_id} | Get single item |
+| GET | /items/project/{project_id} | Get items by project (subset) |
+| POST | /items | Create item |
+| DELETE | /items/{item_id} | Delete item |
+
+### Tags
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | /tags | Get all tags |
+| GET | /tags/{tag_id} | Get single tag |
+| POST | /tags | Create tag |
+| DELETE | /tags/{tag_id} | Delete tag |
+
+### Item Tags
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | /item_tags | Get all item-tag links |
+| GET | /item_tags/{item_id} | Get tags for item (subset) |
+| POST | /item_tags | Link item to tag |
+| DELETE | /item_tags/{item_id}/{tag_id} | Unlink item from tag |
+
+## Project Structure
+
+```
+CSCE-548-PROJECT/
+├── frontend/
+│   ├── index.html       # Single-page frontend UI
+│   └── script.js        # JavaScript fetch() API calls
+├── src/
+│   ├── service.py       # FastAPI endpoints (all 5 tables)
+│   ├── business.py      # Business logic and validation
+│   ├── db.py            # PostgreSQL database queries
+│   ├── models.py        # Pydantic models
+│   └── __init__.py
+├── sql/
+│   ├── schema.sql       # Database schema
+│   └── seed.sql         # Seed data
+├── requirements.txt
+└── README.md
+```
+
+## Setup and Running
+
+### Prerequisites
+- Python 3.10+
+- PostgreSQL 17
+- Virtual environment
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/saisruthivelpula2112/CSCE-548-PROJECT.git
+cd CSCE-548-PROJECT
+
+# Create and activate virtual environment
+python -m venv .venv
+.venv\Scripts\Activate.ps1   # Windows
+# source .venv/bin/activate  # Mac/Linux
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Database Setup
+
+```bash
+# Create database in PostgreSQL
+psql -U postgres -c "CREATE DATABASE csce548_project1;"
+
+# Run schema and seed
+psql -U postgres -d csce548_project1 -f sql/schema.sql
+psql -U postgres -d csce548_project1 -f sql/seed.sql
+```
+
+### Running the Application
+
+```bash
+# Terminal 1 — Start backend API
+uvicorn src.service:app --reload --host 127.0.0.1 --port 9000
+
+# Terminal 2 — Start frontend server
+python -m http.server 8000 --directory frontend
+```
+
+Open **http://127.0.0.1:8000/index.html** in your browser.
+
+## Features
+
+- ✅ GET all records for all 5 tables
+- ✅ GET single record for all 5 tables
+- ✅ GET subset of records (filter by owner/project/item)
+- ✅ INSERT (POST) for all 5 tables
+- ✅ UPDATE (PUT) for users
+- ✅ DELETE for all 5 tables
+- ✅ CORS enabled for cross-origin frontend/backend communication
+- ✅ Inline success/error feedback (no alert popups)
+- ✅ Auto-refresh lists after each operation
+- ✅ Confirmation dialogs before DELETE operations
+
+## AI Tool Usage
+
+Code was generated using **ChatGPT** with the following prompt:
+
+> "Generate a complete HTML and JavaScript frontend for a FastAPI backend running at http://127.0.0.1:9000 with users, projects, items, tags, and item_tags tables. Create a single-page web application with sections for each table to fetch, create, and delete records using vanilla JavaScript with fetch(), show success/error feedback without alert popups, and automatically refresh lists after each operation."
+
+**Modifications made to AI-generated code:**
+- Added `CORSMiddleware` to `service.py` (critical — blocked all requests without it)
+- Extended service, business, and db layers to cover all 5 tables
+- Replaced `alert()` popups with inline green/red feedback boxes
+- Added loading state and enhanced network error messages
+- Added filter/subset endpoints for projects, items, and item_tags
+  
