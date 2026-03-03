@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CSCE 548 — Project 3 Frontend</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, serif; background: #fafafa; color: #111; padding: 32px 48px; max-width: 1000px; }
+  h1   { font-size: 2.2rem; margin-bottom: 24px; }
+  h2   { font-size: 1.25rem; font-weight: bold; margin: 28px 0 10px; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+  h3   { font-size: 1rem; font-weight: bold; margin: 20px 0 8px; color: #333; }
+  hr   { border: none; border-top: 1px solid #ddd; margin: 36px 0; }
+
+  /* status / error boxes */
+  #statusBox { display:none; background:#d4edda; border:1px solid #c3e6cb; color:#155724; padding:10px 14px; border-radius:4px; margin-bottom:16px; font-size:.95rem; }
+  #errorBox  { display:none; background:#f8d7da; border:1px solid #f5c6cb; color:#721c24; padding:10px 14px; border-radius:4px; margin-bottom:16px; font-size:.95rem; }
+
+  /* form rows */
+  .row   { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:6px; }
+  label  { font-size:.9rem; white-space:nowrap; }
+  input  { border:1px solid #999; padding:6px 10px; font-size:.9rem; border-radius:3px; width:200px; }
+  button { padding:7px 18px; font-size:.9rem; border:1px solid #333; background:#fff; border-radius:3px; cursor:pointer; }
+  button:hover { background:#eee; }
+  button.del  { border-color:#c00; color:#c00; }
+  button.del:hover { background:#fdd; }
+  small  { color:#666; font-size:.82rem; display:block; margin-top:2px; }
+
+  /* result lists */
+  ul { list-style:none; padding:0; margin:8px 0 0; }
+  ul li { font-size:.88rem; font-family: Courier, monospace; padding:3px 0; border-bottom:1px dotted #ddd; }
+</style>
+</head>
+<body>
+
+<h1>CSCE 548 — Project 3 Frontend</h1>
+<div id="statusBox"></div>
+<div id="errorBox"></div>
+
+<!-- ═══════════════════════ USERS ═══════════════════════ -->
+<h2>👤 Users</h2>
+
+<h3>Get All Users</h3>
+<div class="row">
+  <button onclick="getUsers()">Load Users</button>
+</div>
+<small>GET /users</small>
+<ul id="userList"></ul>
+
+<h3>Get Single User</h3>
+<div class="row">
+  <label>User id <input id="getSingleUserId" type="number" placeholder="e.g. 1"/></label>
+  <button onclick="getSingleUser()">Get User</button>
+</div>
+<small>GET /users/{id}</small>
+<ul id="singleUserResult"></ul>
+
+<h3>Create User</h3>
+<div class="row">
+  <label>Username <input id="newUsername" placeholder="username"/></label>
+  <label>Email    <input id="newEmail"    placeholder="email@example.com"/></label>
+  <button onclick="createUser()">Create</button>
+</div>
+<small>POST /users — role defaults to student</small>
+
+<h3>Update User</h3>
+<div class="row">
+  <label>User id   <input id="updateUserId"    type="number" placeholder="e.g. 1"/></label>
+  <label>New email <input id="updateUserEmail" placeholder="new@example.com"/></label>
+  <button onclick="updateUser()">Update</button>
+</div>
+<small>PUT /users/{id}</small>
+
+<h3>Delete User</h3>
+<div class="row">
+  <label>User id <input id="deleteUserId" type="number" placeholder="e.g. 1"/></label>
+  <button class="del" onclick="deleteUser()">Delete</button>
+</div>
+<small>DELETE /users/{id}</small>
+
+<hr/>
+<!-- ═══════════════════════ PROJECTS ═══════════════════════ -->
+<h2>📁 Projects</h2>
+
+<h3>Get All Projects</h3>
+<div class="row"><button onclick="getProjects()">Load Projects</button></div>
+<small>GET /projects</small>
+<ul id="projectList"></ul>
+
+<h3>Get Projects by Owner</h3>
+<div class="row">
+  <label>Owner id <input id="ownerFilterId" type="number" placeholder="e.g. 1"/></label>
+  <button onclick="getProjectsByOwner()">Filter</button>
+</div>
+<small>GET /projects/owner/{owner_id} — subset of records</small>
+<ul id="projectSubset"></ul>
+
+<h3>Get Single Project</h3>
+<div class="row">
+  <label>Project id <input id="getSingleProjectId" type="number" placeholder="e.g. 1"/></label>
+  <button onclick="getSingleProject()">Get Project</button>
+</div>
+<small>GET /projects/{id}</small>
+<ul id="singleProjectResult"></ul>
+
+<h3>Create Project</h3>
+<div class="row">
+  <label>Owner id <input id="newProjectOwner" type="number" placeholder="owner user id"/></label>
+  <label>Title    <input id="newProjectTitle" placeholder="Project title"/></label>
+  <button onclick="createProject()">Create</button>
+</div>
+<small>POST /projects</small>
+
+<h3>Delete Project</h3>
+<div class="row">
+  <label>Project id <input id="deleteProjectId" type="number" placeholder="e.g. 1"/></label>
+  <button class="del" onclick="deleteProject()">Delete</button>
+</div>
+<small>DELETE /projects/{id}</small>
+
+<hr/>
+<!-- ═══════════════════════ ITEMS ═══════════════════════ -->
+<h2>🗂 Items</h2>
+
+<h3>Get All Items</h3>
+<div class="row"><button onclick="getItems()">Load Items</button></div>
+<small>GET /items</small>
+<ul id="itemList"></ul>
+
+<h3>Get Items by Project</h3>
+<div class="row">
+  <label>Project id <input id="itemProjectFilter" type="number" placeholder="e.g. 1"/></label>
+  <button onclick="getItemsByProject()">Filter</button>
+</div>
+<small>GET /items/project/{project_id} — subset of records</small>
+<ul id="itemSubset"></ul>
+
+<h3>Get Single Item</h3>
+<div class="row">
+  <label>Item id <input id="getSingleItemId" type="number" placeholder="e.g. 1"/></label>
+  <button onclick="getSingleItem()">Get Item</button>
+</div>
+<small>GET /items/{id}</small>
+<ul id="singleItemResult"></ul>
+
+<h3>Create Item</h3>
+<div class="row">
+  <label>Project id <input id="newItemProject" type="number" placeholder="project id"/></label>
+  <label>Name       <input id="newItemName"    placeholder="Item name"/></label>
+  <button onclick="createItem()">Create</button>
+</div>
+<small>POST /items</small>
+
+<h3>Delete Item</h3>
+<div class="row">
+  <label>Item id <input id="deleteItemId" type="number" placeholder="e.g. 1"/></label>
+  <button class="del" onclick="deleteItem()">Delete</button>
+</div>
+<small>DELETE /items/{id}</small>
+
+<hr/>
+<!-- ═══════════════════════ TAGS ═══════════════════════ -->
+<h2>🏷 Tags</h2>
+
+<h3>Get All Tags</h3>
+<div class="row"><button onclick="getTags()">Load Tags</button></div>
+<small>GET /tags</small>
+<ul id="tagList"></ul>
+
+<h3>Get Single Tag</h3>
+<div class="row">
+  <label>Tag id <input id="getSingleTagId" type="number" placeholder="e.g. 1"/></label>
+  <button onclick="getSingleTag()">Get Tag</button>
+</div>
+<small>GET /tags/{id}</small>
+<ul id="singleTagResult"></ul>
+
+<h3>Create Tag</h3>
+<div class="row">
+  <label>Tag name <input id="newTagName" placeholder="e.g. python"/></label>
+  <button onclick="createTag()">Create</button>
+</div>
+<small>POST /tags</small>
+
+<h3>Delete Tag</h3>
+<div class="row">
+  <label>Tag id <input id="deleteTagId" type="number" placeholder="e.g. 1"/></label>
+  <button class="del" onclick="deleteTag()">Delete</button>
+</div>
+<small>DELETE /tags/{id}</small>
+
+<hr/>
+<!-- ═══════════════════════ ITEM TAGS ═══════════════════════ -->
+<h2>🔗 Item Tags</h2>
+
+<h3>Get All Item-Tag Links</h3>
+<div class="row"><button onclick="getItemTags()">Load Item Tags</button></div>
+<small>GET /item_tags</small>
+<ul id="itemTagList"></ul>
+
+<h3>Get Tags for Item</h3>
+<div class="row">
+  <label>Item id <input id="itemTagFilter" type="number" placeholder="e.g. 1"/></label>
+  <button onclick="getTagsForItem()">Filter</button>
+</div>
+<small>GET /item_tags/{item_id} — subset of records</small>
+<ul id="itemTagSubset"></ul>
+
+<h3>Add Tag to Item</h3>
+<div class="row">
+  <label>Item id <input id="linkItemId" type="number" placeholder="item id"/></label>
+  <label>Tag id  <input id="linkTagId"  type="number" placeholder="tag id"/></label>
+  <button onclick="addItemTag()">Link</button>
+</div>
+<small>POST /item_tags</small>
+
+<h3>Remove Tag from Item</h3>
+<div class="row">
+  <label>Item id <input id="unlinkItemId" type="number" placeholder="item id"/></label>
+  <label>Tag id  <input id="unlinkTagId"  type="number" placeholder="tag id"/></label>
+  <button class="del" onclick="removeItemTag()">Unlink</button>
+</div>
+<small>DELETE /item_tags/{item_id}/{tag_id}</small>
+
+<script src="script.js"></script>
+</body>
+</html>
