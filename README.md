@@ -745,19 +745,9 @@ CSCE-548-PROJECT/
 
 ## System Test Results
 
-All CRUD operations were tested via the frontend and verified in pgAdmin:
-
-| Table | GET All | GET Single | GET Subset | POST | PUT | DELETE |
-|-------|---------|------------|------------|------|-----|--------|
-| Users | ✅ | ✅ | — | ✅ | ✅ | ✅ |
-| Projects | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Items | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Tags | ✅ | ✅ | — | ✅ | — | ✅ |
-| Item Tags | ✅ | ✅ | ✅ | ✅ | — | ✅ |
-
+All CRUD operations were tested via the frontend and verified in pgAdmin
 ---
-
-## 🔧 Troubleshooting
+## Troubleshooting
 
 | Problem | Solution |
 |---------|----------|
