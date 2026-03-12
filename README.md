@@ -550,4 +550,237 @@ Code was generated using **ChatGPT** with the following prompt:
 - Replaced `alert()` popups with inline green/red feedback boxes
 - Added loading state and enhanced network error messages
 - Added filter/subset endpoints for projects, items, and item_tags
-  
+
+  # CSCE 548 — Project 4: Full-Stack N-Tier Web Application
+
+![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green?logo=fastapi)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue?logo=postgresql)
+![Status](https://img.shields.io/badge/Status-Complete-brightgreen)
+
+> **Author:** Velpula Sai Sruthi  
+> **Course:** CSCE 548 — Software Security  
+> **Semester:** Spring 2026
+
+---
+
+## Project Overview
+
+A complete four-layer n-tier web application demonstrating full **CRUD (Create, Read, Update, Delete)** functionality across five database tables. Built using AI-assisted development with Claude (Anthropic).
+
+### Architecture
+
+| Layer | Technology | Description |
+|-------|-----------|-------------|
+| **Data Layer** | PostgreSQL 17 | Relational database with 5 tables |
+| **Business Layer** | Python (business.py) | Input validation and logic |
+| **Service Layer** | FastAPI + Uvicorn | REST API on port 9000 (26 endpoints) |
+| **Client Layer** | HTML5 + JavaScript | Browser frontend on port 8000 |
+
+---
+
+## Database Tables
+
+| Table | Key Columns | Relationships |
+|-------|------------|---------------|
+| `users` | user_id (PK), username, email, role | Owns projects |
+| `projects` | project_id (PK), owner_id (FK), title | Belongs to user |
+| `items` | item_id (PK), project_id (FK), name | Belongs to project |
+| `tags` | tag_id (PK), tag_name | Applied to items |
+| `item_tags` | item_id (FK), tag_id (FK) | Junction table |
+
+---
+
+## Prerequisites
+
+Before you begin, install the following:
+
+- [Python 3.10+](https://python.org)
+- [PostgreSQL 17](https://postgresql.org)
+- [pgAdmin 4](https://pgadmin.org)
+- [Git](https://git-scm.com)
+
+---
+
+## Quick Start
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/saisruthivelpula2112/CSCE-548-PROJECT.git
+cd CSCE-548-PROJECT
+```
+
+### 2. Set Up the Database
+
+1. Open **pgAdmin 4** and create a database named `csce548_project1`
+2. Open the Query Tool and run `sql/schema.sql` (creates tables)
+3. Run `sql/seed.sql` (inserts sample data)
+
+### 3. Configure Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+DB_HOST=localhost
+DB_NAME=csce548_project1
+DB_USER=postgres
+DB_PASSWORD=your_password_here
+DB_PORT=5432
+```
+
+### 4. Set Up Python Environment
+
+```bash
+# Create virtual environment
+python -m venv .venv
+
+# Activate (Windows PowerShell)
+.venv\Scripts\Activate.ps1
+
+# Activate (Mac/Linux)
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 5. Start the Backend
+
+```bash
+uvicorn src.service:app --reload --host 127.0.0.1 --port 9000
+```
+
+✅ Expected: `INFO: Application startup complete.`
+
+### 6. Start the Frontend
+
+Open a **second terminal**:
+
+```bash
+cd frontend
+python -m http.server 8000
+```
+
+✅ Expected: `Serving HTTP on :: port 8000`
+
+### 7. Open the App
+
+Navigate to: **http://127.0.0.1:8000/frontend/**
+
+> 📖 For the full Swagger API docs: **http://127.0.0.1:9000/docs**
+
+---
+
+## Project Structure
+
+```
+CSCE-548-PROJECT/
+├── src/
+│   ├── __init__.py
+│   ├── db.py              # Data layer — psycopg2 SQL queries
+│   ├── business.py        # Business layer — validation logic
+│   └── service.py         # Service layer — FastAPI routes
+├── frontend/
+│   ├── index.html         # Single-page frontend UI
+│   └── script.js          # JavaScript fetch() API calls
+├── sql/
+│   ├── schema.sql         # CREATE TABLE statements
+│   └── seed.sql           # Sample data
+├── .env                   # Database credentials (not in git)
+├── requirements.txt       # Python dependencies
+└── CSCE548_Project4_Deployment_Document.docx
+```
+
+---
+
+## API Endpoints
+
+### Users
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/users` | Get all users |
+| GET | `/users/{id}` | Get user by ID |
+| POST | `/users` | Create new user |
+| PUT | `/users/{id}` | Update user email |
+| DELETE | `/users/{id}` | Delete user |
+
+### Projects
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/projects` | Get all projects |
+| GET | `/projects/{id}` | Get project by ID |
+| GET | `/projects/owner/{id}` | Get projects by owner |
+| POST | `/projects` | Create new project |
+| PUT | `/projects/{id}` | Update project title |
+| DELETE | `/projects/{id}` | Delete project |
+
+### Items
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/items` | Get all items |
+| GET | `/items/{id}` | Get item by ID |
+| GET | `/items/project/{id}` | Get items by project |
+| POST | `/items` | Create new item |
+| PUT | `/items/{id}` | Update item name |
+| DELETE | `/items/{id}` | Delete item |
+
+### Tags
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/tags` | Get all tags |
+| GET | `/tags/{id}` | Get tag by ID |
+| POST | `/tags` | Create new tag |
+| DELETE | `/tags/{id}` | Delete tag |
+
+### Item Tags
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/item_tags` | Get all item-tag links |
+| GET | `/item_tags/{id}` | Get tags for an item |
+| POST | `/item_tags` | Link tag to item |
+| DELETE | `/item_tags/{item_id}/{tag_id}` | Remove tag from item |
+
+---
+
+## System Test Results
+
+All CRUD operations were tested via the frontend and verified in pgAdmin:
+
+| Table | GET All | GET Single | GET Subset | POST | PUT | DELETE |
+|-------|---------|------------|------------|------|-----|--------|
+| Users | ✅ | ✅ | — | ✅ | ✅ | ✅ |
+| Projects | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Items | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Tags | ✅ | ✅ | — | ✅ | — | ✅ |
+| Item Tags | ✅ | ✅ | ✅ | ✅ | — | ✅ |
+
+---
+
+## 🔧 Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| `ModuleNotFoundError: No module named 'src'` | Run uvicorn from the project root, not inside `src/` |
+| Directory listing at port 8000 | Run `python -m http.server 8000` from inside `frontend/` folder |
+| 500 Error on `/tags` | Tags table uses `tag_name` column — verified and fixed in `db.py` |
+| Delete failed | Delete child records first (e.g., items before their project) |
+| CORS error in browser | Ensure `CORSMiddleware` is set with `allow_origins=["*"]` in `service.py` |
+
+---
+
+## AI Tool Usage 
+
+This project was built with assistance from **Claude (Anthropic)** for code generation across all layers. Key areas where AI was used:
+
+- Generating `db.py`, `business.py`, `service.py`, `index.html`, and `script.js`
+- Diagnosing runtime errors from screenshots and error messages
+- Generating this README and the deployment document
+
+**Changes made to AI output:** The AI assumed the tags table used a `name` column — it actually uses `tag_name`. All SQL queries were corrected. PUT endpoints for projects and items were also missing from the initial generation and were added manually. Full analysis is in the deployment document.
+
+---
+
+## Submission
+
+Submitted via Blackboard — GitHub repo link only.
