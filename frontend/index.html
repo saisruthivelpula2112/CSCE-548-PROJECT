@@ -6,222 +6,973 @@
 <title>CSCE 548 — Project 3 Frontend</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Georgia, serif; background: #fafafa; color: #111; padding: 32px 48px; max-width: 1000px; }
-  h1   { font-size: 2.2rem; margin-bottom: 24px; }
-  h2   { font-size: 1.25rem; font-weight: bold; margin: 28px 0 10px; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
-  h3   { font-size: 1rem; font-weight: bold; margin: 20px 0 8px; color: #333; }
-  hr   { border: none; border-top: 1px solid #ddd; margin: 36px 0; }
 
-  /* status / error boxes */
-  #statusBox { display:none; background:#d4edda; border:1px solid #c3e6cb; color:#155724; padding:10px 14px; border-radius:4px; margin-bottom:16px; font-size:.95rem; }
-  #errorBox  { display:none; background:#f8d7da; border:1px solid #f5c6cb; color:#721c24; padding:10px 14px; border-radius:4px; margin-bottom:16px; font-size:.95rem; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    min-height: 100vh;
+  }
 
-  /* form rows */
-  .row   { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:6px; }
-  label  { font-size:.9rem; white-space:nowrap; }
-  input  { border:1px solid #999; padding:6px 10px; font-size:.9rem; border-radius:3px; width:200px; }
-  button { padding:7px 18px; font-size:.9rem; border:1px solid #333; background:#fff; border-radius:3px; cursor:pointer; }
-  button:hover { background:#eee; }
-  button.del  { border-color:#c00; color:#c00; }
-  button.del:hover { background:#fdd; }
-  small  { color:#666; font-size:.82rem; display:block; margin-top:2px; }
+  /* ── Top nav bar ── */
+  .navbar {
+    background: #1a1a2e;
+    color: #fff;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    height: 56px;
+    gap: 8px;
+  }
+  .navbar h1 { font-size: 1.05rem; font-weight: 600; letter-spacing: .02em; }
+  .navbar span { font-size: .85rem; color: #8892b0; margin-left: 4px; }
 
-  /* result lists */
-  ul { list-style:none; padding:0; margin:8px 0 0; }
-  ul li { font-size:.88rem; font-family: Courier, monospace; padding:3px 0; border-bottom:1px dotted #ddd; }
+  /* ── Tab bar ── */
+  .tabbar {
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    padding: 0 32px;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  .tabbar button {
+    padding: 14px 20px;
+    font-size: .9rem;
+    font-weight: 500;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #64748b;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color .15s, border-color .15s;
+  }
+  .tabbar button:hover { color: #1a1a2e; }
+  .tabbar button.active { color: #2563eb; border-bottom-color: #2563eb; }
+
+  /* ── Page content ── */
+  .page { display: none; padding: 28px 32px; max-width: 1100px; }
+  .page.active { display: block; }
+
+  /* ── Section card ── */
+  .card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 20px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .card-header h2 { font-size: .95rem; font-weight: 600; color: #1e293b; }
+  .card-body { padding: 16px 20px; }
+
+  /* ── Alerts ── */
+  .alert {
+    display: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: .875rem;
+    margin-bottom: 14px;
+  }
+  .alert.success { display: block; background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+  .alert.error   { display: block; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+
+  /* ── Inline form ── */
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-end;
+    margin-bottom: 4px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 4px; }
+  .form-group label { font-size: .78rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .04em; }
+  .form-group input {
+    border: 1px solid #cbd5e1;
+    padding: 7px 10px;
+    font-size: .875rem;
+    border-radius: 6px;
+    width: 180px;
+    color: #1a1a2e;
+    background: #fff;
+    transition: border-color .15s;
+  }
+  .form-group input:focus { outline: none; border-color: #2563eb; }
+  .form-group select {
+    border: 1px solid #cbd5e1;
+    padding: 7px 10px;
+    font-size: .875rem;
+    border-radius: 6px;
+    width: 140px;
+    color: #1a1a2e;
+    background: #fff;
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    padding: 7px 16px;
+    font-size: .875rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: background .15s, transform .1s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: #2563eb; color: #fff; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-secondary { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; }
+  .btn-secondary:hover { background: #e2e8f0; }
+  .btn-danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-size: .8rem; padding: 5px 12px; }
+  .btn-danger:hover { background: #fee2e2; }
+  .btn-sm { font-size: .8rem; padding: 5px 12px; }
+
+  /* ── Tables ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+  thead th {
+    text-align: left;
+    padding: 10px 14px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  tbody td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    vertical-align: middle;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #f8fafc; }
+  .empty-row td { text-align: center; color: #94a3b8; font-size: .85rem; padding: 24px; }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: .75rem;
+    font-weight: 600;
+  }
+  .badge-blue   { background: #dbeafe; color: #1e40af; }
+  .badge-green  { background: #dcfce7; color: #166534; }
+  .badge-amber  { background: #fef3c7; color: #92400e; }
+  .badge-purple { background: #ede9fe; color: #5b21b6; }
+  .badge-gray   { background: #f1f5f9; color: #475569; }
+
+  /* ── Avatar ── */
+  .avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: .7rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ── Section divider inside card ── */
+  .section-divider {
+    border: none;
+    border-top: 1px solid #f1f5f9;
+    margin: 16px 0;
+  }
+  .endpoint-label {
+    font-size: .75rem;
+    color: #94a3b8;
+    font-family: 'Courier New', monospace;
+    margin-top: 6px;
+  }
+
+  /* ── Loading spinner ── */
+  .loading { color: #94a3b8; font-size: .85rem; padding: 12px 0; }
 </style>
 </head>
 <body>
 
-<h1>CSCE 548 — Project 3 Frontend</h1>
-<div id="statusBox"></div>
-<div id="errorBox"></div>
-
-<!-- ═══════════════════════ USERS ═══════════════════════ -->
-<h2>👤 Users</h2>
-
-<h3>Get All Users</h3>
-<div class="row">
-  <button onclick="getUsers()">Load Users</button>
+<div class="navbar">
+  <h1>CSCE 548 — Project 3</h1>
+  <span>Database Frontend Client</span>
 </div>
-<small>GET /users</small>
-<ul id="userList"></ul>
 
-<h3>Get Single User</h3>
-<div class="row">
-  <label>User id <input id="getSingleUserId" type="number" placeholder="e.g. 1"/></label>
-  <button onclick="getSingleUser()">Get User</button>
+<div class="tabbar">
+  <button class="active" onclick="switchTab('users',this)">👤 Users</button>
+  <button onclick="switchTab('projects',this)">📁 Projects</button>
+  <button onclick="switchTab('items',this)">🗂 Items</button>
+  <button onclick="switchTab('tags',this)">🏷 Tags</button>
+  <button onclick="switchTab('itemtags',this)">🔗 Item Tags</button>
 </div>
-<small>GET /users/{id}</small>
-<ul id="singleUserResult"></ul>
 
-<h3>Create User</h3>
-<div class="row">
-  <label>Username <input id="newUsername" placeholder="username"/></label>
-  <label>Email    <input id="newEmail"    placeholder="email@example.com"/></label>
-  <button onclick="createUser()">Create</button>
+<!-- ═══════════════ USERS ═══════════════ -->
+<div class="page active" id="page-users">
+
+  <!-- Create User -->
+  <div class="card">
+    <div class="card-header"><h2>Create New User</h2></div>
+    <div class="card-body">
+      <div id="user-alert" class="alert"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Username</label>
+          <input id="newUsername" placeholder="e.g. alice"/>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input id="newEmail" placeholder="alice@example.com"/>
+        </div>
+        <button class="btn btn-primary" style="margin-bottom:1px" onclick="createUser()">Add User</button>
+      </div>
+      <p class="endpoint-label">POST /users</p>
+    </div>
+  </div>
+
+  <!-- Update User -->
+  <div class="card">
+    <div class="card-header"><h2>Update User Email</h2></div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>User ID</label>
+          <input id="updateUserId" type="number" placeholder="e.g. 1"/>
+        </div>
+        <div class="form-group">
+          <label>New Email</label>
+          <input id="updateUserEmail" placeholder="new@example.com"/>
+        </div>
+        <button class="btn btn-secondary" style="margin-bottom:1px" onclick="updateUser()">Update</button>
+      </div>
+      <p class="endpoint-label">PUT /users/{id}</p>
+    </div>
+  </div>
+
+  <!-- All Users Table -->
+  <div class="card">
+    <div class="card-header">
+      <h2>All Users</h2>
+      <button class="btn btn-secondary btn-sm" onclick="getUsers()">Refresh</button>
+    </div>
+    <div class="card-body">
+      <div class="form-row" style="margin-bottom:12px">
+        <div class="form-group">
+          <label>Look up single user by ID</label>
+          <input id="getSingleUserId" type="number" placeholder="e.g. 1"/>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px" onclick="getSingleUser()">Get User</button>
+      </div>
+      <p class="endpoint-label" style="margin-bottom:10px">GET /users &nbsp;|&nbsp; GET /users/{id}</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>ID</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="userList">
+            <tr class="empty-row"><td colspan="5">Click "Refresh" to load users</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- hidden single-user result -->
+      <div id="singleUserResult" style="margin-top:10px"></div>
+    </div>
+  </div>
+
 </div>
-<small>POST /users — role defaults to student</small>
 
-<h3>Update User</h3>
-<div class="row">
-  <label>User id   <input id="updateUserId"    type="number" placeholder="e.g. 1"/></label>
-  <label>New email <input id="updateUserEmail" placeholder="new@example.com"/></label>
-  <button onclick="updateUser()">Update</button>
+<!-- ═══════════════ PROJECTS ═══════════════ -->
+<div class="page" id="page-projects">
+
+  <div class="card">
+    <div class="card-header"><h2>Create New Project</h2></div>
+    <div class="card-body">
+      <div id="project-alert" class="alert"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Owner User ID</label>
+          <input id="newProjectOwner" type="number" placeholder="e.g. 1"/>
+        </div>
+        <div class="form-group">
+          <label>Project Title</label>
+          <input id="newProjectTitle" placeholder="My Research Project"/>
+        </div>
+        <button class="btn btn-primary" style="margin-bottom:1px" onclick="createProject()">Create Project</button>
+      </div>
+      <p class="endpoint-label">POST /projects</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>All Projects</h2>
+      <button class="btn btn-secondary btn-sm" onclick="getProjects()">Refresh</button>
+    </div>
+    <div class="card-body">
+      <div class="form-row" style="margin-bottom:8px">
+        <div class="form-group">
+          <label>Filter by Owner ID</label>
+          <input id="ownerFilterId" type="number" placeholder="e.g. 1"/>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px" onclick="getProjectsByOwner()">Filter</button>
+        <div class="form-group" style="margin-left:16px">
+          <label>Get Single Project by ID</label>
+          <input id="getSingleProjectId" type="number" placeholder="e.g. 1"/>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px" onclick="getSingleProject()">Get Project</button>
+      </div>
+      <p class="endpoint-label" style="margin-bottom:10px">GET /projects &nbsp;|&nbsp; GET /projects/owner/{id} &nbsp;|&nbsp; GET /projects/{id}</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Title</th><th>Project ID</th><th>Owner ID</th><th>Action</th></tr>
+          </thead>
+          <tbody id="projectList">
+            <tr class="empty-row"><td colspan="4">Click "Refresh" to load projects</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="projectSubset" style="margin-top:10px"></div>
+      <div id="singleProjectResult" style="margin-top:10px"></div>
+    </div>
+  </div>
+
 </div>
-<small>PUT /users/{id}</small>
 
-<h3>Delete User</h3>
-<div class="row">
-  <label>User id <input id="deleteUserId" type="number" placeholder="e.g. 1"/></label>
-  <button class="del" onclick="deleteUser()">Delete</button>
+<!-- ═══════════════ ITEMS ═══════════════ -->
+<div class="page" id="page-items">
+
+  <div class="card">
+    <div class="card-header"><h2>Create New Item</h2></div>
+    <div class="card-body">
+      <div id="item-alert" class="alert"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Project ID</label>
+          <input id="newItemProject" type="number" placeholder="e.g. 1"/>
+        </div>
+        <div class="form-group">
+          <label>Item Name</label>
+          <input id="newItemName" placeholder="My Dataset"/>
+        </div>
+        <button class="btn btn-primary" style="margin-bottom:1px" onclick="createItem()">Add Item</button>
+      </div>
+      <p class="endpoint-label">POST /items</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>All Items</h2>
+      <button class="btn btn-secondary btn-sm" onclick="getItems()">Refresh</button>
+    </div>
+    <div class="card-body">
+      <div class="form-row" style="margin-bottom:8px">
+        <div class="form-group">
+          <label>Filter by Project ID</label>
+          <input id="itemProjectFilter" type="number" placeholder="e.g. 1"/>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px" onclick="getItemsByProject()">Filter</button>
+        <div class="form-group" style="margin-left:16px">
+          <label>Get Single Item by ID</label>
+          <input id="getSingleItemId" type="number" placeholder="e.g. 1"/>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px" onclick="getSingleItem()">Get Item</button>
+      </div>
+      <p class="endpoint-label" style="margin-bottom:10px">GET /items &nbsp;|&nbsp; GET /items/project/{id} &nbsp;|&nbsp; GET /items/{id}</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Item Name</th><th>Item ID</th><th>Project ID</th><th>Action</th></tr>
+          </thead>
+          <tbody id="itemList">
+            <tr class="empty-row"><td colspan="4">Click "Refresh" to load items</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="itemSubset" style="margin-top:10px"></div>
+      <div id="singleItemResult" style="margin-top:10px"></div>
+    </div>
+  </div>
+
 </div>
-<small>DELETE /users/{id}</small>
 
-<hr/>
-<!-- ═══════════════════════ PROJECTS ═══════════════════════ -->
-<h2>📁 Projects</h2>
+<!-- ═══════════════ TAGS ═══════════════ -->
+<div class="page" id="page-tags">
 
-<h3>Get All Projects</h3>
-<div class="row"><button onclick="getProjects()">Load Projects</button></div>
-<small>GET /projects</small>
-<ul id="projectList"></ul>
+  <div class="card">
+    <div class="card-header"><h2>Create New Tag</h2></div>
+    <div class="card-body">
+      <div id="tag-alert" class="alert"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tag Name</label>
+          <input id="newTagName" placeholder="e.g. machine-learning"/>
+        </div>
+        <button class="btn btn-primary" style="margin-bottom:1px" onclick="createTag()">Create Tag</button>
+      </div>
+      <p class="endpoint-label">POST /tags</p>
+    </div>
+  </div>
 
-<h3>Get Projects by Owner</h3>
-<div class="row">
-  <label>Owner id <input id="ownerFilterId" type="number" placeholder="e.g. 1"/></label>
-  <button onclick="getProjectsByOwner()">Filter</button>
+  <div class="card">
+    <div class="card-header">
+      <h2>All Tags</h2>
+      <button class="btn btn-secondary btn-sm" onclick="getTags()">Refresh</button>
+    </div>
+    <div class="card-body">
+      <div class="form-row" style="margin-bottom:8px">
+        <div class="form-group">
+          <label>Get Single Tag by ID</label>
+          <input id="getSingleTagId" type="number" placeholder="e.g. 1"/>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px" onclick="getSingleTag()">Get Tag</button>
+      </div>
+      <p class="endpoint-label" style="margin-bottom:10px">GET /tags &nbsp;|&nbsp; GET /tags/{id}</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Tag Name</th><th>Tag ID</th><th>Action</th></tr>
+          </thead>
+          <tbody id="tagList">
+            <tr class="empty-row"><td colspan="3">Click "Refresh" to load tags</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="singleTagResult" style="margin-top:10px"></div>
+    </div>
+  </div>
+
 </div>
-<small>GET /projects/owner/{owner_id} — subset of records</small>
-<ul id="projectSubset"></ul>
 
-<h3>Get Single Project</h3>
-<div class="row">
-  <label>Project id <input id="getSingleProjectId" type="number" placeholder="e.g. 1"/></label>
-  <button onclick="getSingleProject()">Get Project</button>
+<!-- ═══════════════ ITEM TAGS ═══════════════ -->
+<div class="page" id="page-itemtags">
+
+  <div class="card">
+    <div class="card-header"><h2>Link a Tag to an Item</h2></div>
+    <div class="card-body">
+      <div id="itemtag-alert" class="alert"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Item ID</label>
+          <input id="linkItemId" type="number" placeholder="e.g. 2"/>
+        </div>
+        <div class="form-group">
+          <label>Tag ID</label>
+          <input id="linkTagId" type="number" placeholder="e.g. 3"/>
+        </div>
+        <button class="btn btn-primary" style="margin-bottom:1px" onclick="addItemTag()">Link Tag to Item</button>
+      </div>
+      <p class="endpoint-label">POST /item_tags</p>
+
+      <hr class="section-divider"/>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Unlink — Item ID</label>
+          <input id="unlinkItemId" type="number" placeholder="item id"/>
+        </div>
+        <div class="form-group">
+          <label>Unlink — Tag ID</label>
+          <input id="unlinkTagId" type="number" placeholder="tag id"/>
+        </div>
+        <button class="btn btn-danger" style="margin-bottom:1px" onclick="removeItemTag()">Remove Link</button>
+      </div>
+      <p class="endpoint-label">DELETE /item_tags/{item_id}/{tag_id}</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>All Item–Tag Links</h2>
+      <button class="btn btn-secondary btn-sm" onclick="getItemTags()">Refresh</button>
+    </div>
+    <div class="card-body">
+      <div class="form-row" style="margin-bottom:8px">
+        <div class="form-group">
+          <label>Filter by Item ID</label>
+          <input id="itemTagFilter" type="number" placeholder="e.g. 1"/>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px" onclick="getTagsForItem()">Filter</button>
+      </div>
+      <p class="endpoint-label" style="margin-bottom:10px">GET /item_tags &nbsp;|&nbsp; GET /item_tags/{item_id}</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Item Name</th><th>Tag Name</th><th>Item ID</th><th>Tag ID</th></tr>
+          </thead>
+          <tbody id="itemTagList">
+            <tr class="empty-row"><td colspan="4">Click "Refresh" to load item–tag links</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="itemTagSubset" style="margin-top:10px"></div>
+    </div>
+  </div>
+
 </div>
-<small>GET /projects/{id}</small>
-<ul id="singleProjectResult"></ul>
 
-<h3>Create Project</h3>
-<div class="row">
-  <label>Owner id <input id="newProjectOwner" type="number" placeholder="owner user id"/></label>
-  <label>Title    <input id="newProjectTitle" placeholder="Project title"/></label>
-  <button onclick="createProject()">Create</button>
-</div>
-<small>POST /projects</small>
+<script>
+// ── Tab switching ──
+function switchTab(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tabbar button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  btn.classList.add('active');
+}
 
-<h3>Delete Project</h3>
-<div class="row">
-  <label>Project id <input id="deleteProjectId" type="number" placeholder="e.g. 1"/></label>
-  <button class="del" onclick="deleteProject()">Delete</button>
-</div>
-<small>DELETE /projects/{id}</small>
+// ── Alert helpers ──
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'alert ' + type;
+  setTimeout(() => { el.className = 'alert'; }, 4000);
+}
 
-<hr/>
-<!-- ═══════════════════════ ITEMS ═══════════════════════ -->
-<h2>🗂 Items</h2>
+// ── Render helpers ──
+function initials(name) {
+  if (!name) return '??';
+  return name.slice(0, 2).toUpperCase();
+}
+function roleColor(r) {
+  if (r === 'admin') return 'badge-amber';
+  if (r === 'instructor') return 'badge-purple';
+  return 'badge-blue';
+}
 
-<h3>Get All Items</h3>
-<div class="row"><button onclick="getItems()">Load Items</button></div>
-<small>GET /items</small>
-<ul id="itemList"></ul>
+// ── Render: Users table rows ──
+function renderUsers(data) {
+  const tbody = document.getElementById('userList');
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No users found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(u => `
+    <tr>
+      <td>
+        <span class="avatar">${initials(u.username)}</span>
+        <strong>${u.username}</strong>
+      </td>
+      <td>${u.email}</td>
+      <td><span class="badge ${roleColor(u.role)}">${u.role || 'student'}</span></td>
+      <td><span class="badge badge-gray">#${u.id}</span></td>
+      <td>
+        <button class="btn btn-danger" onclick="deleteUser_id(${u.id})">Delete</button>
+      </td>
+    </tr>`).join('');
+}
 
-<h3>Get Items by Project</h3>
-<div class="row">
-  <label>Project id <input id="itemProjectFilter" type="number" placeholder="e.g. 1"/></label>
-  <button onclick="getItemsByProject()">Filter</button>
-</div>
-<small>GET /items/project/{project_id} — subset of records</small>
-<ul id="itemSubset"></ul>
+// ── Render: Projects table rows ──
+function renderProjects(data, tbodyId) {
+  const tbody = document.getElementById(tbodyId);
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="4">No projects found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td><strong>${p.title || 'Untitled'}</strong></td>
+      <td><span class="badge badge-gray">#${p.project_id || p.id}</span></td>
+      <td><span class="badge badge-blue">Owner #${p.owner_id}</span></td>
+      <td>
+        <button class="btn btn-danger" onclick="deleteProject_id(${p.project_id || p.id})">Delete</button>
+      </td>
+    </tr>`).join('');
+}
 
-<h3>Get Single Item</h3>
-<div class="row">
-  <label>Item id <input id="getSingleItemId" type="number" placeholder="e.g. 1"/></label>
-  <button onclick="getSingleItem()">Get Item</button>
-</div>
-<small>GET /items/{id}</small>
-<ul id="singleItemResult"></ul>
+// ── Render: Items table rows ──
+function renderItems(data, tbodyId) {
+  const tbody = document.getElementById(tbodyId);
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="4">No items found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(i => `
+    <tr>
+      <td><strong>${i.title || i.name || 'Untitled'}</strong></td>
+      <td><span class="badge badge-gray">#${i.item_id || i.id}</span></td>
+      <td><span class="badge badge-green">Project #${i.project_id}</span></td>
+      <td>
+        <button class="btn btn-danger" onclick="deleteItem_id(${i.item_id || i.id})">Delete</button>
+      </td>
+    </tr>`).join('');
+}
 
-<h3>Create Item</h3>
-<div class="row">
-  <label>Project id <input id="newItemProject" type="number" placeholder="project id"/></label>
-  <label>Name       <input id="newItemName"    placeholder="Item name"/></label>
-  <button onclick="createItem()">Create</button>
-</div>
-<small>POST /items</small>
+// ── Render: Tags table rows ──
+function renderTags(data, tbodyId) {
+  const tbody = document.getElementById(tbodyId);
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="3">No tags found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(t => `
+    <tr>
+      <td><span class="badge badge-amber">${t.name || t.tag_name}</span></td>
+      <td><span class="badge badge-gray">#${t.tag_id || t.id}</span></td>
+      <td>
+        <button class="btn btn-danger" onclick="deleteTag_id(${t.tag_id || t.id})">Delete</button>
+      </td>
+    </tr>`).join('');
+}
 
-<h3>Delete Item</h3>
-<div class="row">
-  <label>Item id <input id="deleteItemId" type="number" placeholder="e.g. 1"/></label>
-  <button class="del" onclick="deleteItem()">Delete</button>
-</div>
-<small>DELETE /items/{id}</small>
+// ── Render: Item-Tags table rows ──
+function renderItemTags(data, tbodyId) {
+  const tbody = document.getElementById(tbodyId);
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="4">No links found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(l => `
+    <tr>
+      <td><strong>${l.item_name || ('Item #' + l.item_id)}</strong></td>
+      <td><span class="badge badge-amber">${l.tag_name || ('Tag #' + l.tag_id)}</span></td>
+      <td><span class="badge badge-gray">#${l.item_id}</span></td>
+      <td><span class="badge badge-gray">#${l.tag_id}</span></td>
+    </tr>`).join('');
+}
 
-<hr/>
-<!-- ═══════════════════════ TAGS ═══════════════════════ -->
-<h2>🏷 Tags</h2>
+// ══════════════════════════════════════════════
+//  The functions below keep the SAME names as
+//  your existing script.js so nothing breaks.
+// ══════════════════════════════════════════════
 
-<h3>Get All Tags</h3>
-<div class="row"><button onclick="getTags()">Load Tags</button></div>
-<small>GET /tags</small>
-<ul id="tagList"></ul>
+const API = 'http://127.0.0.1:8080';
 
-<h3>Get Single Tag</h3>
-<div class="row">
-  <label>Tag id <input id="getSingleTagId" type="number" placeholder="e.g. 1"/></label>
-  <button onclick="getSingleTag()">Get Tag</button>
-</div>
-<small>GET /tags/{id}</small>
-<ul id="singleTagResult"></ul>
+async function getUsers() {
+  try {
+    const r = await fetch(API + '/users');
+    const d = await r.json();
+    renderUsers(d);
+  } catch(e) { showAlert('user-alert','Could not connect to server.','error'); }
+}
 
-<h3>Create Tag</h3>
-<div class="row">
-  <label>Tag name <input id="newTagName" placeholder="e.g. python"/></label>
-  <button onclick="createTag()">Create</button>
-</div>
-<small>POST /tags</small>
+async function getSingleUser() {
+  const id = document.getElementById('getSingleUserId').value;
+  if (!id) { showAlert('user-alert','Please enter a User ID.','error'); return; }
+  try {
+    const r = await fetch(API + '/users/' + id);
+    const d = await r.json();
+    renderUsers(Array.isArray(d) ? d : [d]);
+    showAlert('user-alert','Showing user #' + id + '.','success');
+  } catch(e) { showAlert('user-alert','User not found.','error'); }
+}
 
-<h3>Delete Tag</h3>
-<div class="row">
-  <label>Tag id <input id="deleteTagId" type="number" placeholder="e.g. 1"/></label>
-  <button class="del" onclick="deleteTag()">Delete</button>
-</div>
-<small>DELETE /tags/{id}</small>
+async function createUser() {
+  const username = document.getElementById('newUsername').value.trim();
+  const email    = document.getElementById('newEmail').value.trim();
+  if (!username || !email) { showAlert('user-alert','Please fill in both username and email.','error'); return; }
+  try {
+    const r = await fetch(API + '/users', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ username, email })
+    });
+    if (r.ok) {
+      showAlert('user-alert','User "' + username + '" created successfully.','success');
+      document.getElementById('newUsername').value = '';
+      document.getElementById('newEmail').value = '';
+      getUsers();
+    } else { showAlert('user-alert','Failed to create user. Username may already exist.','error'); }
+  } catch(e) { showAlert('user-alert','Connection error.','error'); }
+}
 
-<hr/>
-<!-- ═══════════════════════ ITEM TAGS ═══════════════════════ -->
-<h2>🔗 Item Tags</h2>
+async function updateUser() {
+  const id    = document.getElementById('updateUserId').value;
+  const email = document.getElementById('updateUserEmail').value.trim();
+  if (!id || !email) { showAlert('user-alert','Please enter User ID and new email.','error'); return; }
+  try {
+    const r = await fetch(API + '/users/' + id, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email })
+    });
+    if (r.ok) {
+      showAlert('user-alert','User #' + id + ' updated successfully.','success');
+      document.getElementById('updateUserEmail').value = '';
+      getUsers();
+    } else { showAlert('user-alert','Update failed.','error'); }
+  } catch(e) { showAlert('user-alert','Connection error.','error'); }
+}
 
-<h3>Get All Item-Tag Links</h3>
-<div class="row"><button onclick="getItemTags()">Load Item Tags</button></div>
-<small>GET /item_tags</small>
-<ul id="itemTagList"></ul>
+async function deleteUser() {
+  const id = document.getElementById('deleteUserId').value;
+  if (!id) return;
+  if (!confirm('Delete user #' + id + '? This cannot be undone.')) return;
+  await deleteUser_id(id);
+}
+async function deleteUser_id(id) {
+  try {
+    await fetch(API + '/users/' + id, { method:'DELETE' });
+    showAlert('user-alert','User #' + id + ' deleted.','success');
+    getUsers();
+  } catch(e) { showAlert('user-alert','Delete failed.','error'); }
+}
 
-<h3>Get Tags for Item</h3>
-<div class="row">
-  <label>Item id <input id="itemTagFilter" type="number" placeholder="e.g. 1"/></label>
-  <button onclick="getTagsForItem()">Filter</button>
-</div>
-<small>GET /item_tags/{item_id} — subset of records</small>
-<ul id="itemTagSubset"></ul>
+// ── Projects ──
+async function getProjects() {
+  try {
+    const r = await fetch(API + '/projects');
+    const d = await r.json();
+    renderProjects(d, 'projectList');
+  } catch(e) { showAlert('project-alert','Could not load projects.','error'); }
+}
 
-<h3>Add Tag to Item</h3>
-<div class="row">
-  <label>Item id <input id="linkItemId" type="number" placeholder="item id"/></label>
-  <label>Tag id  <input id="linkTagId"  type="number" placeholder="tag id"/></label>
-  <button onclick="addItemTag()">Link</button>
-</div>
-<small>POST /item_tags</small>
+async function getProjectsByOwner() {
+  const id = document.getElementById('ownerFilterId').value;
+  if (!id) return;
+  try {
+    const r = await fetch(API + '/projects/owner/' + id);
+    const d = await r.json();
+    const sub = document.getElementById('projectSubset');
+    sub.innerHTML = '<p style="font-size:.8rem;color:#64748b;margin-bottom:6px">Filtered: owner #' + id + '</p>';
+    const tmp = document.createElement('div');
+    tmp.className = 'table-wrap';
+    tmp.innerHTML = '<table><thead><tr><th>Title</th><th>Project ID</th><th>Owner ID</th><th>Action</th></tr></thead><tbody id="projSubTbody"></tbody></table>';
+    sub.appendChild(tmp);
+    renderProjects(Array.isArray(d) ? d : [d], 'projSubTbody');
+  } catch(e) { showAlert('project-alert','Filter failed.','error'); }
+}
 
-<h3>Remove Tag from Item</h3>
-<div class="row">
-  <label>Item id <input id="unlinkItemId" type="number" placeholder="item id"/></label>
-  <label>Tag id  <input id="unlinkTagId"  type="number" placeholder="tag id"/></label>
-  <button class="del" onclick="removeItemTag()">Unlink</button>
-</div>
-<small>DELETE /item_tags/{item_id}/{tag_id}</small>
+async function getSingleProject() {
+  const id = document.getElementById('getSingleProjectId').value;
+  if (!id) return;
+  try {
+    const r = await fetch(API + '/projects/' + id);
+    const d = await r.json();
+    renderProjects(Array.isArray(d) ? d : [d], 'projectList');
+    showAlert('project-alert','Showing project #' + id + '.','success');
+  } catch(e) { showAlert('project-alert','Project not found.','error'); }
+}
 
-<script src="script.js"></script>
+async function createProject() {
+  const owner_id = parseInt(document.getElementById('newProjectOwner').value);
+  const title    = document.getElementById('newProjectTitle').value.trim();
+  if (!owner_id || !title) { showAlert('project-alert','Please fill in owner ID and title.','error'); return; }
+  try {
+    const r = await fetch(API + '/projects', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ owner_id, title })
+    });
+    if (r.ok) {
+      showAlert('project-alert','Project "' + title + '" created.','success');
+      document.getElementById('newProjectTitle').value = '';
+      getProjects();
+    } else { showAlert('project-alert','Failed to create project.','error'); }
+  } catch(e) { showAlert('project-alert','Connection error.','error'); }
+}
+
+async function deleteProject() {
+  const id = document.getElementById('deleteProjectId').value;
+  if (!id) return;
+  await deleteProject_id(id);
+}
+async function deleteProject_id(id) {
+  if (!confirm('Delete project #' + id + '?')) return;
+  try {
+    await fetch(API + '/projects/' + id, { method:'DELETE' });
+    showAlert('project-alert','Project #' + id + ' deleted.','success');
+    getProjects();
+  } catch(e) { showAlert('project-alert','Delete failed.','error'); }
+}
+
+// ── Items ──
+async function getItems() {
+  try {
+    const r = await fetch(API + '/items');
+    const d = await r.json();
+    renderItems(d, 'itemList');
+  } catch(e) { showAlert('item-alert','Could not load items.','error'); }
+}
+
+async function getItemsByProject() {
+  const id = document.getElementById('itemProjectFilter').value;
+  if (!id) return;
+  try {
+    const r = await fetch(API + '/items/project/' + id);
+    const d = await r.json();
+    const sub = document.getElementById('itemSubset');
+    sub.innerHTML = '<p style="font-size:.8rem;color:#64748b;margin-bottom:6px">Filtered: project #' + id + '</p>';
+    const tmp = document.createElement('div');
+    tmp.className = 'table-wrap';
+    tmp.innerHTML = '<table><thead><tr><th>Item Name</th><th>Item ID</th><th>Project ID</th><th>Action</th></tr></thead><tbody id="itemSubTbody"></tbody></table>';
+    sub.appendChild(tmp);
+    renderItems(Array.isArray(d) ? d : [d], 'itemSubTbody');
+  } catch(e) { showAlert('item-alert','Filter failed.','error'); }
+}
+
+async function getSingleItem() {
+  const id = document.getElementById('getSingleItemId').value;
+  if (!id) return;
+  try {
+    const r = await fetch(API + '/items/' + id);
+    const d = await r.json();
+    renderItems(Array.isArray(d) ? d : [d], 'itemList');
+    showAlert('item-alert','Showing item #' + id + '.','success');
+  } catch(e) { showAlert('item-alert','Item not found.','error'); }
+}
+
+async function createItem() {
+  const project_id = parseInt(document.getElementById('newItemProject').value);
+  const name       = document.getElementById('newItemName').value.trim();
+  if (!project_id || !name) { showAlert('item-alert','Please fill in project ID and item name.','error'); return; }
+  try {
+    const r = await fetch(API + '/items', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ project_id, title: name })
+    });
+    if (r.ok) {
+      showAlert('item-alert','Item "' + name + '" added.','success');
+      document.getElementById('newItemName').value = '';
+      getItems();
+    } else { showAlert('item-alert','Failed to add item.','error'); }
+  } catch(e) { showAlert('item-alert','Connection error.','error'); }
+}
+
+async function deleteItem() {
+  const id = document.getElementById('deleteItemId').value;
+  if (!id) return;
+  await deleteItem_id(id);
+}
+async function deleteItem_id(id) {
+  if (!confirm('Delete item #' + id + '?')) return;
+  try {
+    await fetch(API + '/items/' + id, { method:'DELETE' });
+    showAlert('item-alert','Item #' + id + ' deleted.','success');
+    getItems();
+  } catch(e) { showAlert('item-alert','Delete failed.','error'); }
+}
+
+// ── Tags ──
+async function getTags() {
+  try {
+    const r = await fetch(API + '/tags');
+    const d = await r.json();
+    renderTags(d, 'tagList');
+  } catch(e) { showAlert('tag-alert','Could not load tags.','error'); }
+}
+
+async function getSingleTag() {
+  const id = document.getElementById('getSingleTagId').value;
+  if (!id) return;
+  try {
+    const r = await fetch(API + '/tags/' + id);
+    const d = await r.json();
+    renderTags(Array.isArray(d) ? d : [d], 'tagList');
+    showAlert('tag-alert','Showing tag #' + id + '.','success');
+  } catch(e) { showAlert('tag-alert','Tag not found.','error'); }
+}
+
+async function createTag() {
+  const name = document.getElementById('newTagName').value.trim();
+  if (!name) { showAlert('tag-alert','Please enter a tag name.','error'); return; }
+  try {
+    const r = await fetch(API + '/tags', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name })
+    });
+    if (r.ok) {
+      showAlert('tag-alert','Tag "' + name + '" created.','success');
+      document.getElementById('newTagName').value = '';
+      getTags();
+    } else { showAlert('tag-alert','Failed to create tag.','error'); }
+  } catch(e) { showAlert('tag-alert','Connection error.','error'); }
+}
+
+async function deleteTag() {
+  const id = document.getElementById('deleteTagId').value;
+  if (!id) return;
+  await deleteTag_id(id);
+}
+async function deleteTag_id(id) {
+  if (!confirm('Delete tag #' + id + '?')) return;
+  try {
+    await fetch(API + '/tags/' + id, { method:'DELETE' });
+    showAlert('tag-alert','Tag #' + id + ' deleted.','success');
+    getTags();
+  } catch(e) { showAlert('tag-alert','Delete failed.','error'); }
+}
+
+// ── Item Tags ──
+async function getItemTags() {
+  try {
+    const r = await fetch(API + '/item_tags');
+    const d = await r.json();
+    renderItemTags(d, 'itemTagList');
+  } catch(e) { showAlert('itemtag-alert','Could not load item–tag links.','error'); }
+}
+
+async function getTagsForItem() {
+  const id = document.getElementById('itemTagFilter').value;
+  if (!id) return;
+  try {
+    const r = await fetch(API + '/item_tags/' + id);
+    const d = await r.json();
+    const sub = document.getElementById('itemTagSubset');
+    sub.innerHTML = '<p style="font-size:.8rem;color:#64748b;margin-bottom:6px">Filtered: item #' + id + '</p>';
+    const tmp = document.createElement('div');
+    tmp.className = 'table-wrap';
+    tmp.innerHTML = '<table><thead><tr><th>Item Name</th><th>Tag Name</th><th>Item ID</th><th>Tag ID</th></tr></thead><tbody id="itemTagSubTbody"></tbody></table>';
+    sub.appendChild(tmp);
+    renderItemTags(Array.isArray(d) ? d : [d], 'itemTagSubTbody');
+  } catch(e) { showAlert('itemtag-alert','Filter failed.','error'); }
+}
+
+async function addItemTag() {
+  const item_id = parseInt(document.getElementById('linkItemId').value);
+  const tag_id  = parseInt(document.getElementById('linkTagId').value);
+  if (!item_id || !tag_id) { showAlert('itemtag-alert','Please enter both Item ID and Tag ID.','error'); return; }
+  try {
+    const r = await fetch(API + '/item_tags', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ item_id, tag_id })
+    });
+    if (r.ok) {
+      showAlert('itemtag-alert','Tag #' + tag_id + ' linked to item #' + item_id + '.','success');
+      document.getElementById('linkItemId').value = '';
+      document.getElementById('linkTagId').value = '';
+      getItemTags();
+    } else { showAlert('itemtag-alert','Link failed. It may already exist.','error'); }
+  } catch(e) { showAlert('itemtag-alert','Connection error.','error'); }
+}
+
+async function removeItemTag() {
+  const item_id = document.getElementById('unlinkItemId').value;
+  const tag_id  = document.getElementById('unlinkTagId').value;
+  if (!item_id || !tag_id) { showAlert('itemtag-alert','Please enter both Item ID and Tag ID.','error'); return; }
+  if (!confirm('Remove link between item #' + item_id + ' and tag #' + tag_id + '?')) return;
+  try {
+    await fetch(API + '/item_tags/' + item_id + '/' + tag_id, { method:'DELETE' });
+    showAlert('itemtag-alert','Link removed successfully.','success');
+    document.getElementById('unlinkItemId').value = '';
+    document.getElementById('unlinkTagId').value = '';
+    getItemTags();
+  } catch(e) { showAlert('itemtag-alert','Delete failed.','error'); }
+}
+</script>
 </body>
 </html>
