@@ -11,15 +11,18 @@ from .db import (
     get_project_by_id as db_get_project_by_id,
     get_projects_by_owner as db_get_projects_by_owner,
     create_project as db_create_project,
+    update_project as db_update_project,
     delete_project as db_delete_project,
     get_all_items as db_get_all_items,
     get_item_by_id as db_get_item_by_id,
     get_items_by_project as db_get_items_by_project,
     create_item as db_create_item,
+    update_item as db_update_item,
     delete_item as db_delete_item,
     get_all_tags as db_get_all_tags,
     get_tag_by_id as db_get_tag_by_id,
     create_tag as db_create_tag,
+    update_tag as db_update_tag,
     delete_tag as db_delete_tag,
     get_all_item_tags as db_get_all_item_tags,
     get_tags_for_item as db_get_tags_for_item,
@@ -96,6 +99,19 @@ def create_project(owner_id: int, title: str) -> Dict:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+def update_project(project_id: int, title: str) -> Dict:
+    if not title:
+        raise HTTPException(status_code=400, detail="title required")
+    try:
+        updated = db_update_project(project_id, title)
+        if not updated:
+            raise HTTPException(status_code=404, detail="project not found")
+        return updated
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 def delete_project(project_id: int) -> None:
     try:
         ok = db_delete_project(project_id)
@@ -130,6 +146,19 @@ def create_item(project_id: int, name: str) -> Dict:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+def update_item(item_id: int, name: str) -> Dict:
+    if not name:
+        raise HTTPException(status_code=400, detail="name required")
+    try:
+        updated = db_update_item(item_id, name)
+        if not updated:
+            raise HTTPException(status_code=404, detail="item not found")
+        return updated
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 def delete_item(item_id: int) -> None:
     try:
         ok = db_delete_item(item_id)
@@ -156,6 +185,19 @@ def create_tag(tag_name: str) -> Dict:
         raise HTTPException(status_code=400, detail="tag_name required")
     try:
         return db_create_tag(tag_name)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+def update_tag(tag_id: int, tag_name: str) -> Dict:
+    if not tag_name:
+        raise HTTPException(status_code=400, detail="tag_name required")
+    try:
+        updated = db_update_tag(tag_id, tag_name)
+        if not updated:
+            raise HTTPException(status_code=404, detail="tag not found")
+        return updated
     except HTTPException:
         raise
     except Exception as e:

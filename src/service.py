@@ -8,11 +8,11 @@ from .business import (
     # users
     get_all_users, get_user, create_user, update_user, delete_user,
     # projects
-    get_all_projects, get_project, get_projects_by_owner, create_project, delete_project,
+    get_all_projects, get_project, get_projects_by_owner, create_project, update_project, delete_project,
     # items
-    get_all_items, get_item, get_items_by_project, create_item, delete_item,
+    get_all_items, get_item, get_items_by_project, create_item, update_item, delete_item,
     # tags
-    get_all_tags, get_tag, create_tag, delete_tag,
+    get_all_tags, get_tag, create_tag, update_tag, delete_tag,
     # item_tags
     get_all_item_tags, get_tags_for_item, add_item_tag, remove_item_tag,
 )
@@ -34,15 +34,29 @@ class UserCreate(BaseModel):
     email: str
     role: str = "student"
 
+class UserUpdate(BaseModel):
+    username: str | None = None
+    email: str | None = None
+    role: str | None = None
+
 class ProjectCreate(BaseModel):
     owner_id: int
+    title: str
+
+class ProjectUpdate(BaseModel):
     title: str
 
 class ItemCreate(BaseModel):
     project_id: int
     name: str
 
+class ItemUpdate(BaseModel):
+    name: str
+
 class TagCreate(BaseModel):
+    tag_name: str
+
+class TagUpdate(BaseModel):
     tag_name: str
 
 class ItemTagCreate(BaseModel):
@@ -55,17 +69,17 @@ class ItemTagCreate(BaseModel):
 def api_get_users():
     return get_all_users()
 
-@app.get("/users/{user_id}", tags=["Users"])
-def api_get_user(user_id: int):
-    return get_user(user_id)
-
 @app.post("/users", status_code=201, tags=["Users"])
 def api_create_user(payload: UserCreate):
     return create_user(payload.username, payload.email, payload.role)
 
+@app.get("/users/{user_id}", tags=["Users"])
+def api_get_user(user_id: int):
+    return get_user(user_id)
+
 @app.put("/users/{user_id}", tags=["Users"])
-def api_update_user(user_id: int, payload: Dict[str, Any] = Body(...)):
-    return update_user(user_id, payload.get("username"), payload.get("email"), payload.get("role"))
+def api_update_user(user_id: int, payload: UserUpdate):
+    return update_user(user_id, payload.username, payload.email, payload.role)
 
 @app.delete("/users/{user_id}", status_code=204, tags=["Users"])
 def api_delete_user(user_id: int):
@@ -77,17 +91,22 @@ def api_delete_user(user_id: int):
 def api_get_projects():
     return get_all_projects()
 
-@app.get("/projects/{project_id}", tags=["Projects"])
-def api_get_project(project_id: int):
-    return get_project(project_id)
+@app.post("/projects", status_code=201, tags=["Projects"])
+def api_create_project(payload: ProjectCreate):
+    return create_project(payload.owner_id, payload.title)
 
+# ⚠️ specific routes BEFORE /{id} to avoid conflict
 @app.get("/projects/owner/{owner_id}", tags=["Projects"])
 def api_get_projects_by_owner(owner_id: int):
     return get_projects_by_owner(owner_id)
 
-@app.post("/projects", status_code=201, tags=["Projects"])
-def api_create_project(payload: ProjectCreate):
-    return create_project(payload.owner_id, payload.title)
+@app.get("/projects/{project_id}", tags=["Projects"])
+def api_get_project(project_id: int):
+    return get_project(project_id)
+
+@app.put("/projects/{project_id}", tags=["Projects"])
+def api_update_project(project_id: int, payload: ProjectUpdate):
+    return update_project(project_id, payload.title)
 
 @app.delete("/projects/{project_id}", status_code=204, tags=["Projects"])
 def api_delete_project(project_id: int):
@@ -99,17 +118,22 @@ def api_delete_project(project_id: int):
 def api_get_items():
     return get_all_items()
 
-@app.get("/items/{item_id}", tags=["Items"])
-def api_get_item(item_id: int):
-    return get_item(item_id)
+@app.post("/items", status_code=201, tags=["Items"])
+def api_create_item(payload: ItemCreate):
+    return create_item(payload.project_id, payload.name)
 
+# ⚠️ specific routes BEFORE /{id} to avoid conflict
 @app.get("/items/project/{project_id}", tags=["Items"])
 def api_get_items_by_project(project_id: int):
     return get_items_by_project(project_id)
 
-@app.post("/items", status_code=201, tags=["Items"])
-def api_create_item(payload: ItemCreate):
-    return create_item(payload.project_id, payload.name)
+@app.get("/items/{item_id}", tags=["Items"])
+def api_get_item(item_id: int):
+    return get_item(item_id)
+
+@app.put("/items/{item_id}", tags=["Items"])
+def api_update_item(item_id: int, payload: ItemUpdate):
+    return update_item(item_id, payload.name)
 
 @app.delete("/items/{item_id}", status_code=204, tags=["Items"])
 def api_delete_item(item_id: int):
@@ -121,13 +145,17 @@ def api_delete_item(item_id: int):
 def api_get_tags():
     return get_all_tags()
 
+@app.post("/tags", status_code=201, tags=["Tags"])
+def api_create_tag(payload: TagCreate):
+    return create_tag(payload.tag_name)
+
 @app.get("/tags/{tag_id}", tags=["Tags"])
 def api_get_tag(tag_id: int):
     return get_tag(tag_id)
 
-@app.post("/tags", status_code=201, tags=["Tags"])
-def api_create_tag(payload: TagCreate):
-    return create_tag(payload.tag_name)
+@app.put("/tags/{tag_id}", tags=["Tags"])
+def api_update_tag(tag_id: int, payload: TagUpdate):
+    return update_tag(tag_id, payload.tag_name)
 
 @app.delete("/tags/{tag_id}", status_code=204, tags=["Tags"])
 def api_delete_tag(tag_id: int):
@@ -139,13 +167,13 @@ def api_delete_tag(tag_id: int):
 def api_get_item_tags():
     return get_all_item_tags()
 
-@app.get("/item_tags/{item_id}", tags=["ItemTags"])
-def api_get_tags_for_item(item_id: int):
-    return get_tags_for_item(item_id)
-
 @app.post("/item_tags", status_code=201, tags=["ItemTags"])
 def api_add_item_tag(payload: ItemTagCreate):
     return add_item_tag(payload.item_id, payload.tag_id)
+
+@app.get("/item_tags/{item_id}", tags=["ItemTags"])
+def api_get_tags_for_item(item_id: int):
+    return get_tags_for_item(item_id)
 
 @app.delete("/item_tags/{item_id}/{tag_id}", status_code=204, tags=["ItemTags"])
 def api_remove_item_tag(item_id: int, tag_id: int):

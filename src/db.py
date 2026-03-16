@@ -88,6 +88,15 @@ def create_project(owner_id: int, title: str) -> Dict:
             )
             return cur.fetchone()
 
+def update_project(project_id: int, title: str) -> Optional[Dict]:
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                "UPDATE projects SET title=%s WHERE project_id=%s RETURNING project_id, owner_id, title;",
+                (title, project_id),
+            )
+            return cur.fetchone()
+
 def delete_project(project_id: int) -> bool:
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -123,6 +132,15 @@ def create_item(project_id: int, name: str) -> Dict:
             )
             return cur.fetchone()
 
+def update_item(item_id: int, name: str) -> Optional[Dict]:
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                "UPDATE items SET name=%s WHERE item_id=%s RETURNING item_id, project_id, name;",
+                (name, item_id),
+            )
+            return cur.fetchone()
+
 def delete_item(item_id: int) -> bool:
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -149,6 +167,15 @@ def create_tag(tag_name: str) -> Dict:
             cur.execute(
                 "INSERT INTO tags (tag_name) VALUES (%s) RETURNING tag_id, tag_name;",
                 (tag_name,),
+            )
+            return cur.fetchone()
+
+def update_tag(tag_id: int, tag_name: str) -> Optional[Dict]:
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                "UPDATE tags SET tag_name=%s WHERE tag_id=%s RETURNING tag_id, tag_name;",
+                (tag_name, tag_id),
             )
             return cur.fetchone()
 

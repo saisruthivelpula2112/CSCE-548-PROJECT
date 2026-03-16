@@ -3,976 +3,580 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CSCE 548 — Project 3 Frontend</title>
+<title>CSCE 548 — Project 3 | Database Frontend Client</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet"/>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3250;
+    --accent: #5b6ef5;
+    --accent2: #38d9a9;
+    --danger: #f87171;
+    --text: #e2e4f0;
+    --muted: #6b7280;
+    --success-bg: #0d2b22;
+    --success-text: #38d9a9;
+    --error-bg: #2b0d0d;
+    --error-text: #f87171;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background: #f0f2f5;
-    color: #1a1a2e;
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
     min-height: 100vh;
   }
 
-  /* ── Top nav bar ── */
-  .navbar {
-    background: #1a1a2e;
-    color: #fff;
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
     padding: 0 32px;
     display: flex;
     align-items: center;
+    gap: 16px;
     height: 56px;
-    gap: 8px;
   }
-  .navbar h1 { font-size: 1.05rem; font-weight: 600; letter-spacing: .02em; }
-  .navbar span { font-size: .85rem; color: #8892b0; margin-left: 4px; }
+  header h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+  header span {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 300;
+  }
 
-  /* ── Tab bar ── */
-  .tabbar {
-    background: #fff;
-    border-bottom: 1px solid #e2e8f0;
-    display: flex;
+  /* ── TABS ── */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
     padding: 0 32px;
+    display: flex;
     gap: 4px;
-    overflow-x: auto;
   }
-  .tabbar button {
-    padding: 14px 20px;
-    font-size: .9rem;
-    font-weight: 500;
+  nav button {
     background: none;
     border: none;
-    border-bottom: 3px solid transparent;
-    color: #64748b;
+    color: var(--muted);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    padding: 12px 16px;
     cursor: pointer;
-    white-space: nowrap;
-    transition: color .15s, border-color .15s;
-  }
-  .tabbar button:hover { color: #1a1a2e; }
-  .tabbar button.active { color: #2563eb; border-bottom-color: #2563eb; }
-
-  /* ── Page content ── */
-  .page { display: none; padding: 28px 32px; max-width: 1100px; }
-  .page.active { display: block; }
-
-  /* ── Section card ── */
-  .card {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    overflow: hidden;
-  }
-  .card-header {
-    padding: 14px 20px;
-    background: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    gap: 6px;
   }
-  .card-header h2 { font-size: .95rem; font-weight: 600; color: #1e293b; }
-  .card-body { padding: 16px 20px; }
+  nav button:hover { color: var(--text); }
+  nav button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
 
-  /* ── Alerts ── */
-  .alert {
-    display: none;
+  /* ── MAIN ── */
+  main { padding: 32px; max-width: 1100px; margin: 0 auto; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .card h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+  }
+
+  /* ── STATUS BOXES ── */
+  .status-box {
     padding: 10px 14px;
     border-radius: 6px;
-    font-size: .875rem;
-    margin-bottom: 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
   }
-  .alert.success { display: block; background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
-  .alert.error   { display: block; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+  .status-box.success { background: var(--success-bg); color: var(--success-text); border: 1px solid #1a5c40; }
+  .status-box.error   { background: var(--error-bg);   color: var(--error-text);   border: 1px solid #5c1a1a; }
 
-  /* ── Inline form ── */
+  /* ── FORM ROW ── */
   .form-row {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     align-items: flex-end;
-    margin-bottom: 4px;
   }
-  .form-group { display: flex; flex-direction: column; gap: 4px; }
-  .form-group label { font-size: .78rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .04em; }
-  .form-group input {
-    border: 1px solid #cbd5e1;
-    padding: 7px 10px;
-    font-size: .875rem;
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  input[type="text"], input[type="number"], input[type="email"] {
+    background: var(--bg);
+    border: 1px solid var(--border);
     border-radius: 6px;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    padding: 8px 12px;
     width: 180px;
-    color: #1a1a2e;
-    background: #fff;
-    transition: border-color .15s;
+    transition: border-color 0.15s;
+    outline: none;
   }
-  .form-group input:focus { outline: none; border-color: #2563eb; }
-  .form-group select {
-    border: 1px solid #cbd5e1;
-    padding: 7px 10px;
-    font-size: .875rem;
-    border-radius: 6px;
-    width: 140px;
-    color: #1a1a2e;
-    background: #fff;
-  }
+  input:focus { border-color: var(--accent); }
+  input::placeholder { color: var(--muted); }
 
-  /* ── Buttons ── */
+  /* ── BUTTONS ── */
   .btn {
-    padding: 7px 16px;
-    font-size: .875rem;
-    font-weight: 500;
+    padding: 8px 16px;
     border-radius: 6px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
     border: none;
-    transition: background .15s, transform .1s;
+    transition: opacity 0.15s;
   }
-  .btn:active { transform: scale(.97); }
-  .btn-primary { background: #2563eb; color: #fff; }
-  .btn-primary:hover { background: #1d4ed8; }
-  .btn-secondary { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; }
-  .btn-secondary:hover { background: #e2e8f0; }
-  .btn-danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-size: .8rem; padding: 5px 12px; }
-  .btn-danger:hover { background: #fee2e2; }
-  .btn-sm { font-size: .8rem; padding: 5px 12px; }
+  .btn:hover { opacity: 0.85; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-success { background: #1a5c40; color: var(--accent2); border: 1px solid #2a8c60; }
+  .btn-danger  { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 4px 10px; font-size: 12px; }
+  .btn-ghost   { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
 
-  /* ── Tables ── */
-  .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: .875rem; }
-  thead th {
-    text-align: left;
-    padding: 10px 14px;
-    background: #f8fafc;
-    color: #64748b;
-    font-size: .75rem;
-    font-weight: 700;
+  .api-hint {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; margin-top: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { border-bottom: 1px solid var(--border); }
+  th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: .05em;
-    border-bottom: 1px solid #e2e8f0;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding: 8px 12px;
+    text-align: left;
   }
-  tbody td {
-    padding: 11px 14px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #334155;
-    vertical-align: middle;
-  }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+  tbody tr:hover { background: var(--surface2); }
   tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover td { background: #f8fafc; }
-  .empty-row td { text-align: center; color: #94a3b8; font-size: .85rem; padding: 24px; }
-
-  /* ── Badges ── */
   .badge {
     display: inline-block;
-    padding: 3px 9px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
     border-radius: 20px;
-    font-size: .75rem;
-    font-weight: 600;
+    padding: 2px 10px;
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
   }
-  .badge-blue   { background: #dbeafe; color: #1e40af; }
-  .badge-green  { background: #dcfce7; color: #166534; }
-  .badge-amber  { background: #fef3c7; color: #92400e; }
-  .badge-purple { background: #ede9fe; color: #5b21b6; }
-  .badge-gray   { background: #f1f5f9; color: #475569; }
-
-  /* ── Avatar ── */
-  .avatar {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    background: #dbeafe;
-    color: #1e40af;
-    font-size: .7rem;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 8px;
-    vertical-align: middle;
+  .tag-badge {
+    display: inline-block;
+    background: #2b2a1a;
+    border: 1px solid #5c5020;
+    color: #d4b84a;
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 12px;
   }
 
-  /* ── Section divider inside card ── */
-  .section-divider {
-    border: none;
-    border-top: 1px solid #f1f5f9;
-    margin: 16px 0;
-  }
-  .endpoint-label {
-    font-size: .75rem;
-    color: #94a3b8;
-    font-family: 'Courier New', monospace;
-    margin-top: 6px;
-  }
-
-  /* ── Loading spinner ── */
-  .loading { color: #94a3b8; font-size: .85rem; padding: 12px 0; }
+  /* ── DIVIDER ── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 </style>
 </head>
 <body>
 
-<div class="navbar">
+<header>
   <h1>CSCE 548 — Project 3</h1>
   <span>Database Frontend Client</span>
-</div>
+</header>
 
-<div class="tabbar">
+<nav>
   <button class="active" onclick="switchTab('users',this)">👤 Users</button>
   <button onclick="switchTab('projects',this)">📁 Projects</button>
-  <button onclick="switchTab('items',this)">🗂 Items</button>
+  <button onclick="switchTab('items',this)">📦 Items</button>
   <button onclick="switchTab('tags',this)">🏷 Tags</button>
   <button onclick="switchTab('itemtags',this)">🔗 Item Tags</button>
-</div>
+</nav>
 
-<!-- ═══════════════ USERS ═══════════════ -->
-<div class="page active" id="page-users">
+<main>
 
-  <!-- Create User -->
+<!-- ══════════════════════════════════════════════ USERS ══ -->
+<div id="tab-users" class="tab-panel active">
+
+  <!-- Create -->
   <div class="card">
-    <div class="card-header"><h2>Create New User</h2></div>
-    <div class="card-body">
-      <div id="user-alert" class="alert"></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Username</label>
-          <input id="newUsername" placeholder="e.g. alice"/>
-        </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input id="newEmail" placeholder="alice@example.com"/>
-        </div>
-        <button class="btn btn-primary" style="margin-bottom:1px" onclick="createUser()">Add User</button>
-      </div>
-      <p class="endpoint-label">POST /users</p>
+    <h3>Create New User</h3>
+    <div id="userStatus" class="status-box"></div>
+    <div class="form-row">
+      <div class="field"><label>Username</label><input id="newUsername" placeholder="e.g. jdoe"/></div>
+      <div class="field"><label>Email</label><input id="newEmail" type="email" placeholder="e.g. j@example.com"/></div>
+      <button class="btn btn-primary" onclick="createUser()">Create User</button>
     </div>
+    <p class="api-hint">POST /users</p>
   </div>
 
-  <!-- Update User -->
+  <!-- Update -->
   <div class="card">
-    <div class="card-header"><h2>Update User Email</h2></div>
-    <div class="card-body">
-      <div class="form-row">
-        <div class="form-group">
-          <label>User ID</label>
-          <input id="updateUserId" type="number" placeholder="e.g. 1"/>
-        </div>
-        <div class="form-group">
-          <label>New Email</label>
-          <input id="updateUserEmail" placeholder="new@example.com"/>
-        </div>
-        <button class="btn btn-secondary" style="margin-bottom:1px" onclick="updateUser()">Update</button>
-      </div>
-      <p class="endpoint-label">PUT /users/{id}</p>
+    <h3>Update User Email</h3>
+    <div class="form-row">
+      <div class="field"><label>User ID</label><input id="updateUserId" type="number" placeholder="e.g. 1"/></div>
+      <div class="field"><label>New Email</label><input id="updateUserEmail" type="email" placeholder="new@email.com"/></div>
+      <button class="btn btn-success" onclick="updateUser()">Update User</button>
     </div>
+    <p class="api-hint">PUT /users/{id}</p>
   </div>
 
-  <!-- All Users Table -->
+  <!-- Delete -->
   <div class="card">
-    <div class="card-header">
-      <h2>All Users</h2>
-      <button class="btn btn-secondary btn-sm" onclick="getUsers()">Refresh</button>
+    <h3>Delete User</h3>
+    <div class="form-row">
+      <div class="field"><label>User ID</label><input id="deleteUserId" type="number" placeholder="e.g. 1"/></div>
+      <button class="btn btn-danger" style="align-self:flex-end" onclick="deleteUser()">Delete User</button>
     </div>
-    <div class="card-body">
-      <div class="form-row" style="margin-bottom:12px">
-        <div class="form-group">
-          <label>Look up single user by ID</label>
+    <p class="api-hint">DELETE /users/{id}</p>
+  </div>
+
+  <!-- Read -->
+  <div class="card">
+    <h3>All Users</h3>
+    <div class="form-row" style="margin-bottom:12px">
+      <div class="field"><label>Get Single User by ID</label>
+        <div class="form-row" style="gap:6px">
           <input id="getSingleUserId" type="number" placeholder="e.g. 1"/>
+          <button class="btn btn-ghost" onclick="getSingleUser()">Get User</button>
         </div>
-        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px" onclick="getSingleUser()">Get User</button>
       </div>
-      <p class="endpoint-label" style="margin-bottom:10px">GET /users &nbsp;|&nbsp; GET /users/{id}</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>ID</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="userList">
-            <tr class="empty-row"><td colspan="5">Click "Refresh" to load users</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <!-- hidden single-user result -->
-      <div id="singleUserResult" style="margin-top:10px"></div>
+      <button class="btn btn-ghost" style="align-self:flex-end" onclick="getUsers()">Load All</button>
     </div>
+    <p class="api-hint">GET /users &nbsp;|&nbsp; GET /users/{id}</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th></tr></thead>
+        <tbody id="userList"><tr><td colspan="4" style="color:var(--muted)">Click "Load All" to fetch users.</td></tr></tbody>
+      </table>
+    </div>
+    <ul id="singleUserResult" style="margin-top:8px;list-style:none;font-size:13px;color:var(--accent2)"></ul>
   </div>
 
 </div>
 
-<!-- ═══════════════ PROJECTS ═══════════════ -->
-<div class="page" id="page-projects">
+<!-- ══════════════════════════════════════════════ PROJECTS ══ -->
+<div id="tab-projects" class="tab-panel">
 
   <div class="card">
-    <div class="card-header"><h2>Create New Project</h2></div>
-    <div class="card-body">
-      <div id="project-alert" class="alert"></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Owner User ID</label>
-          <input id="newProjectOwner" type="number" placeholder="e.g. 1"/>
-        </div>
-        <div class="form-group">
-          <label>Project Title</label>
-          <input id="newProjectTitle" placeholder="My Research Project"/>
-        </div>
-        <button class="btn btn-primary" style="margin-bottom:1px" onclick="createProject()">Create Project</button>
-      </div>
-      <p class="endpoint-label">POST /projects</p>
+    <h3>Create New Project</h3>
+    <div id="projectStatus" class="status-box"></div>
+    <div class="form-row">
+      <div class="field"><label>Owner User ID</label><input id="newProjectOwner" type="number" placeholder="e.g. 1"/></div>
+      <div class="field"><label>Project Title</label><input id="newProjectTitle" placeholder="My Project"/></div>
+      <button class="btn btn-primary" onclick="createProject()">Create Project</button>
     </div>
+    <p class="api-hint">POST /projects</p>
   </div>
 
   <div class="card">
-    <div class="card-header">
-      <h2>All Projects</h2>
-      <button class="btn btn-secondary btn-sm" onclick="getProjects()">Refresh</button>
+    <h3>Update Project Title</h3>
+    <div class="form-row">
+      <div class="field"><label>Project ID</label><input id="updateProjectId" type="number" placeholder="e.g. 1"/></div>
+      <div class="field"><label>New Title</label><input id="updateProjectTitle" placeholder="Updated Title"/></div>
+      <button class="btn btn-success" onclick="updateProject()">Update Project</button>
     </div>
-    <div class="card-body">
-      <div class="form-row" style="margin-bottom:8px">
-        <div class="form-group">
-          <label>Filter by Owner ID</label>
+    <p class="api-hint">PUT /projects/{id}</p>
+  </div>
+
+  <div class="card">
+    <h3>Delete Project</h3>
+    <div class="form-row">
+      <div class="field"><label>Project ID</label><input id="deleteProjectId" type="number" placeholder="e.g. 1"/></div>
+      <button class="btn btn-danger" style="align-self:flex-end" onclick="deleteProject()">Delete Project</button>
+    </div>
+    <p class="api-hint">DELETE /projects/{id}</p>
+  </div>
+
+  <div class="card">
+    <h3>All Projects</h3>
+    <div class="form-row" style="margin-bottom:12px">
+      <div class="field"><label>Filter by Owner ID</label>
+        <div class="form-row" style="gap:6px">
           <input id="ownerFilterId" type="number" placeholder="e.g. 1"/>
+          <button class="btn btn-ghost" onclick="getProjectsByOwner()">Filter</button>
         </div>
-        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px" onclick="getProjectsByOwner()">Filter</button>
-        <div class="form-group" style="margin-left:16px">
-          <label>Get Single Project by ID</label>
+      </div>
+      <div class="field"><label>Get Single Project by ID</label>
+        <div class="form-row" style="gap:6px">
           <input id="getSingleProjectId" type="number" placeholder="e.g. 1"/>
+          <button class="btn btn-ghost" onclick="getSingleProject()">Get Project</button>
         </div>
-        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px" onclick="getSingleProject()">Get Project</button>
       </div>
-      <p class="endpoint-label" style="margin-bottom:10px">GET /projects &nbsp;|&nbsp; GET /projects/owner/{id} &nbsp;|&nbsp; GET /projects/{id}</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Title</th><th>Project ID</th><th>Owner ID</th><th>Action</th></tr>
-          </thead>
-          <tbody id="projectList">
-            <tr class="empty-row"><td colspan="4">Click "Refresh" to load projects</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div id="projectSubset" style="margin-top:10px"></div>
-      <div id="singleProjectResult" style="margin-top:10px"></div>
+      <button class="btn btn-ghost" style="align-self:flex-end" onclick="getProjects()">Load All</button>
     </div>
+    <p class="api-hint">GET /projects &nbsp;|&nbsp; GET /projects/owner/{id} &nbsp;|&nbsp; GET /projects/{id}</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Title</th><th>Project ID</th><th>Owner ID</th></tr></thead>
+        <tbody id="projectList"><tr><td colspan="3" style="color:var(--muted)">Click "Load All" to fetch projects.</td></tr></tbody>
+      </table>
+    </div>
+    <ul id="projectSubset" style="margin-top:8px;list-style:none;font-size:13px;color:var(--accent2)"></ul>
+    <ul id="singleProjectResult" style="margin-top:4px;list-style:none;font-size:13px;color:var(--accent2)"></ul>
   </div>
 
 </div>
 
-<!-- ═══════════════ ITEMS ═══════════════ -->
-<div class="page" id="page-items">
+<!-- ══════════════════════════════════════════════ ITEMS ══ -->
+<div id="tab-items" class="tab-panel">
 
   <div class="card">
-    <div class="card-header"><h2>Create New Item</h2></div>
-    <div class="card-body">
-      <div id="item-alert" class="alert"></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Project ID</label>
-          <input id="newItemProject" type="number" placeholder="e.g. 1"/>
-        </div>
-        <div class="form-group">
-          <label>Item Name</label>
-          <input id="newItemName" placeholder="My Dataset"/>
-        </div>
-        <button class="btn btn-primary" style="margin-bottom:1px" onclick="createItem()">Add Item</button>
-      </div>
-      <p class="endpoint-label">POST /items</p>
+    <h3>Create New Item</h3>
+    <div id="itemStatus" class="status-box"></div>
+    <div class="form-row">
+      <div class="field"><label>Project ID</label><input id="newItemProject" type="number" placeholder="e.g. 1"/></div>
+      <div class="field"><label>Item Name</label><input id="newItemName" placeholder="My Item"/></div>
+      <button class="btn btn-primary" onclick="createItem()">Add Item</button>
     </div>
+    <p class="api-hint">POST /items</p>
   </div>
 
   <div class="card">
-    <div class="card-header">
-      <h2>All Items</h2>
-      <button class="btn btn-secondary btn-sm" onclick="getItems()">Refresh</button>
+    <h3>Update Item Name</h3>
+    <div class="form-row">
+      <div class="field"><label>Item ID</label><input id="updateItemId" type="number" placeholder="e.g. 1"/></div>
+      <div class="field"><label>New Name</label><input id="updateItemName" placeholder="Updated Name"/></div>
+      <button class="btn btn-success" onclick="updateItem()">Update Item</button>
     </div>
-    <div class="card-body">
-      <div class="form-row" style="margin-bottom:8px">
-        <div class="form-group">
-          <label>Filter by Project ID</label>
+    <p class="api-hint">PUT /items/{id}</p>
+  </div>
+
+  <div class="card">
+    <h3>Delete Item</h3>
+    <div class="form-row">
+      <div class="field"><label>Item ID</label><input id="deleteItemId" type="number" placeholder="e.g. 1"/></div>
+      <button class="btn btn-danger" style="align-self:flex-end" onclick="deleteItem()">Delete Item</button>
+    </div>
+    <p class="api-hint">DELETE /items/{id}</p>
+  </div>
+
+  <div class="card">
+    <h3>All Items</h3>
+    <div class="form-row" style="margin-bottom:12px">
+      <div class="field"><label>Filter by Project ID</label>
+        <div class="form-row" style="gap:6px">
           <input id="itemProjectFilter" type="number" placeholder="e.g. 1"/>
+          <button class="btn btn-ghost" onclick="getItemsByProject()">Filter</button>
         </div>
-        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px" onclick="getItemsByProject()">Filter</button>
-        <div class="form-group" style="margin-left:16px">
-          <label>Get Single Item by ID</label>
+      </div>
+      <div class="field"><label>Get Single Item by ID</label>
+        <div class="form-row" style="gap:6px">
           <input id="getSingleItemId" type="number" placeholder="e.g. 1"/>
+          <button class="btn btn-ghost" onclick="getSingleItem()">Get Item</button>
         </div>
-        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px" onclick="getSingleItem()">Get Item</button>
       </div>
-      <p class="endpoint-label" style="margin-bottom:10px">GET /items &nbsp;|&nbsp; GET /items/project/{id} &nbsp;|&nbsp; GET /items/{id}</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Item Name</th><th>Item ID</th><th>Project ID</th><th>Action</th></tr>
-          </thead>
-          <tbody id="itemList">
-            <tr class="empty-row"><td colspan="4">Click "Refresh" to load items</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div id="itemSubset" style="margin-top:10px"></div>
-      <div id="singleItemResult" style="margin-top:10px"></div>
+      <button class="btn btn-ghost" style="align-self:flex-end" onclick="getItems()">Load All</button>
     </div>
+    <p class="api-hint">GET /items &nbsp;|&nbsp; GET /items/project/{id} &nbsp;|&nbsp; GET /items/{id}</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Item ID</th><th>Name</th><th>Project ID</th><th>Action</th></tr></thead>
+        <tbody id="itemList"><tr><td colspan="4" style="color:var(--muted)">Click "Load All" to fetch items.</td></tr></tbody>
+      </table>
+    </div>
+    <ul id="itemSubset" style="margin-top:8px;list-style:none;font-size:13px;color:var(--accent2)"></ul>
+    <ul id="singleItemResult" style="margin-top:4px;list-style:none;font-size:13px;color:var(--accent2)"></ul>
   </div>
 
 </div>
 
-<!-- ═══════════════ TAGS ═══════════════ -->
-<div class="page" id="page-tags">
+<!-- ══════════════════════════════════════════════ TAGS ══ -->
+<div id="tab-tags" class="tab-panel">
 
   <div class="card">
-    <div class="card-header"><h2>Create New Tag</h2></div>
-    <div class="card-body">
-      <div id="tag-alert" class="alert"></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Tag Name</label>
-          <input id="newTagName" placeholder="e.g. machine-learning"/>
-        </div>
-        <button class="btn btn-primary" style="margin-bottom:1px" onclick="createTag()">Create Tag</button>
-      </div>
-      <p class="endpoint-label">POST /tags</p>
+    <h3>Create New Tag</h3>
+    <div id="tagStatus" class="status-box"></div>
+    <div class="form-row">
+      <div class="field"><label>Tag Name</label><input id="newTagName" placeholder="e.g. python"/></div>
+      <button class="btn btn-primary" onclick="createTag()">Create Tag</button>
     </div>
+    <p class="api-hint">POST /tags</p>
   </div>
 
   <div class="card">
-    <div class="card-header">
-      <h2>All Tags</h2>
-      <button class="btn btn-secondary btn-sm" onclick="getTags()">Refresh</button>
+    <h3>Update Tag Name</h3>
+    <div class="form-row">
+      <div class="field"><label>Tag ID</label><input id="updateTagId" type="number" placeholder="e.g. 1"/></div>
+      <div class="field"><label>New Tag Name</label><input id="updateTagName" placeholder="updated-name"/></div>
+      <button class="btn btn-success" onclick="updateTag()">Update Tag</button>
     </div>
-    <div class="card-body">
-      <div class="form-row" style="margin-bottom:8px">
-        <div class="form-group">
-          <label>Get Single Tag by ID</label>
+    <p class="api-hint">PUT /tags/{id}</p>
+  </div>
+
+  <div class="card">
+    <h3>Delete Tag</h3>
+    <div class="form-row">
+      <div class="field"><label>Tag ID</label><input id="deleteTagId" type="number" placeholder="e.g. 1"/></div>
+      <button class="btn btn-danger" style="align-self:flex-end" onclick="deleteTag()">Delete Tag</button>
+    </div>
+    <p class="api-hint">DELETE /tags/{id}</p>
+  </div>
+
+  <div class="card">
+    <h3>All Tags</h3>
+    <div class="form-row" style="margin-bottom:12px">
+      <div class="field"><label>Get Single Tag by ID</label>
+        <div class="form-row" style="gap:6px">
           <input id="getSingleTagId" type="number" placeholder="e.g. 1"/>
+          <button class="btn btn-ghost" onclick="getSingleTag()">Get Tag</button>
         </div>
-        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px" onclick="getSingleTag()">Get Tag</button>
       </div>
-      <p class="endpoint-label" style="margin-bottom:10px">GET /tags &nbsp;|&nbsp; GET /tags/{id}</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Tag Name</th><th>Tag ID</th><th>Action</th></tr>
-          </thead>
-          <tbody id="tagList">
-            <tr class="empty-row"><td colspan="3">Click "Refresh" to load tags</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div id="singleTagResult" style="margin-top:10px"></div>
+      <button class="btn btn-ghost" style="align-self:flex-end" onclick="getTags()">Load All</button>
     </div>
+    <p class="api-hint">GET /tags &nbsp;|&nbsp; GET /tags/{id}</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tag ID</th><th>Tag Name</th><th>Action</th></tr></thead>
+        <tbody id="tagList"><tr><td colspan="3" style="color:var(--muted)">Click "Load All" to fetch tags.</td></tr></tbody>
+      </table>
+    </div>
+    <ul id="singleTagResult" style="margin-top:8px;list-style:none;font-size:13px;color:var(--accent2)"></ul>
   </div>
 
 </div>
 
-<!-- ═══════════════ ITEM TAGS ═══════════════ -->
-<div class="page" id="page-itemtags">
+<!-- ══════════════════════════════════════════════ ITEM TAGS ══ -->
+<div id="tab-itemtags" class="tab-panel">
 
   <div class="card">
-    <div class="card-header"><h2>Link a Tag to an Item</h2></div>
-    <div class="card-body">
-      <div id="itemtag-alert" class="alert"></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Item ID</label>
-          <input id="linkItemId" type="number" placeholder="e.g. 2"/>
-        </div>
-        <div class="form-group">
-          <label>Tag ID</label>
-          <input id="linkTagId" type="number" placeholder="e.g. 3"/>
-        </div>
-        <button class="btn btn-primary" style="margin-bottom:1px" onclick="addItemTag()">Link Tag to Item</button>
-      </div>
-      <p class="endpoint-label">POST /item_tags</p>
-
-      <hr class="section-divider"/>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Unlink — Item ID</label>
-          <input id="unlinkItemId" type="number" placeholder="item id"/>
-        </div>
-        <div class="form-group">
-          <label>Unlink — Tag ID</label>
-          <input id="unlinkTagId" type="number" placeholder="tag id"/>
-        </div>
-        <button class="btn btn-danger" style="margin-bottom:1px" onclick="removeItemTag()">Remove Link</button>
-      </div>
-      <p class="endpoint-label">DELETE /item_tags/{item_id}/{tag_id}</p>
+    <h3>Link a Tag to an Item</h3>
+    <div id="itemTagStatus" class="status-box"></div>
+    <div class="form-row">
+      <div class="field"><label>Item ID</label><input id="linkItemId" type="number" placeholder="e.g. 2"/></div>
+      <div class="field"><label>Tag ID</label><input id="linkTagId" type="number" placeholder="e.g. 3"/></div>
+      <button class="btn btn-primary" onclick="addItemTag()">Link Tag to Item</button>
     </div>
+    <p class="api-hint">POST /item_tags</p>
+    <hr/>
+    <div class="form-row" style="margin-top:4px">
+      <div class="field"><label>Unlink — Item ID</label><input id="unlinkItemId" type="number" placeholder="item id"/></div>
+      <div class="field"><label>Unlink — Tag ID</label><input id="unlinkTagId" type="number" placeholder="tag id"/></div>
+      <button class="btn btn-danger" style="align-self:flex-end" onclick="removeItemTag()">Remove Link</button>
+    </div>
+    <p class="api-hint">DELETE /item_tags/{item_id}/{tag_id}</p>
   </div>
 
   <div class="card">
-    <div class="card-header">
-      <h2>All Item–Tag Links</h2>
-      <button class="btn btn-secondary btn-sm" onclick="getItemTags()">Refresh</button>
-    </div>
-    <div class="card-body">
-      <div class="form-row" style="margin-bottom:8px">
-        <div class="form-group">
-          <label>Filter by Item ID</label>
+    <h3>All Item Tags</h3>
+    <div class="form-row" style="margin-bottom:12px">
+      <div class="field"><label>Get Tags for Item ID</label>
+        <div class="form-row" style="gap:6px">
           <input id="itemTagFilter" type="number" placeholder="e.g. 1"/>
+          <button class="btn btn-ghost" onclick="getTagsForItem()">Filter</button>
         </div>
-        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px" onclick="getTagsForItem()">Filter</button>
       </div>
-      <p class="endpoint-label" style="margin-bottom:10px">GET /item_tags &nbsp;|&nbsp; GET /item_tags/{item_id}</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Item Name</th><th>Tag Name</th><th>Item ID</th><th>Tag ID</th></tr>
-          </thead>
-          <tbody id="itemTagList">
-            <tr class="empty-row"><td colspan="4">Click "Refresh" to load item–tag links</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div id="itemTagSubset" style="margin-top:10px"></div>
+      <button class="btn btn-ghost" style="align-self:flex-end" onclick="getItemTags()">Load All</button>
     </div>
+    <p class="api-hint">GET /item_tags &nbsp;|&nbsp; GET /item_tags/{item_id}</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Item Name</th><th>Tag Name</th><th>Item ID</th><th>Tag ID</th></tr></thead>
+        <tbody id="itemTagList"><tr><td colspan="4" style="color:var(--muted)">Click "Load All" to fetch item tags.</td></tr></tbody>
+      </table>
+    </div>
+    <ul id="itemTagSubset" style="margin-top:8px;list-style:none;font-size:13px;color:var(--accent2)"></ul>
   </div>
 
 </div>
 
+</main>
+
+<script src="script.js"></script>
 <script>
-// ── Tab switching ──
+// ── Tab switching ─────────────────────────────────────────
 function switchTab(name, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tabbar button').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
 }
 
-// ── Alert helpers ──
-function showAlert(id, msg, type) {
-  const el = document.getElementById(id);
+// ── Override renderList to render into tables where applicable ──
+const TABLE_MAPS = {
+  userList:    u  => `<tr><td><span class="badge">#${u.id}</span></td><td>${u.username}</td><td>${u.email}</td><td>${u.role}</td></tr>`,
+  projectList: p  => `<tr><td>${p.title}</td><td><span class="badge">#${p.project_id}</span></td><td><span class="badge">Owner #${p.owner_id}</span></td></tr>`,
+  itemList:    i  => `<tr><td><span class="badge">#${i.item_id}</span></td><td>${i.name||i.item_name||i.title}</td><td><span class="badge">#${i.project_id}</span></td><td><button class="btn btn-danger" onclick="deleteItem(${i.item_id})">Delete</button></td></tr>`,
+  tagList:     t  => `<tr><td><span class="badge">#${t.tag_id}</span></td><td><span class="tag-badge">${t.tag_name||t.name}</span></td><td><button class="btn btn-danger" onclick="deleteTag(${t.tag_id})">Delete</button></td></tr>`,
+  itemTagList: it => `<tr><td>${it.item_name||''}</td><td><span class="tag-badge">${it.tag_name}</span></td><td><span class="badge">#${it.item_id}</span></td><td><span class="badge">#${it.tag_id}</span></td></tr>`,
+};
+
+function renderList(ulId, items, fmt) {
+  const el = document.getElementById(ulId);
   if (!el) return;
-  el.textContent = msg;
-  el.className = 'alert ' + type;
-  setTimeout(() => { el.className = 'alert'; }, 4000);
-}
-
-// ── Render helpers ──
-function initials(name) {
-  if (!name) return '??';
-  return name.slice(0, 2).toUpperCase();
-}
-function roleColor(r) {
-  if (r === 'admin') return 'badge-amber';
-  if (r === 'instructor') return 'badge-purple';
-  return 'badge-blue';
-}
-
-// ── Render: Users table rows ──
-function renderUsers(data) {
-  const tbody = document.getElementById('userList');
-  if (!data || data.length === 0) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No users found</td></tr>';
+  if (!items || items.length === 0) {
+    if (el.tagName === 'TBODY') el.innerHTML = `<tr><td colspan="10" style="color:var(--muted)"><em>No records found.</em></td></tr>`;
+    else el.innerHTML = '<li><em>No records found.</em></li>';
     return;
   }
-  tbody.innerHTML = data.map(u => `
-    <tr>
-      <td>
-        <span class="avatar">${initials(u.username)}</span>
-        <strong>${u.username}</strong>
-      </td>
-      <td>${u.email}</td>
-      <td><span class="badge ${roleColor(u.role)}">${u.role || 'student'}</span></td>
-      <td><span class="badge badge-gray">#${u.id}</span></td>
-      <td>
-        <button class="btn btn-danger" onclick="deleteUser_id(${u.id})">Delete</button>
-      </td>
-    </tr>`).join('');
-}
-
-// ── Render: Projects table rows ──
-function renderProjects(data, tbodyId) {
-  const tbody = document.getElementById(tbodyId);
-  if (!data || data.length === 0) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="4">No projects found</td></tr>';
-    return;
+  if (TABLE_MAPS[ulId]) {
+    el.innerHTML = items.map(TABLE_MAPS[ulId]).join('');
+  } else {
+    el.innerHTML = items.map(i => `<li style="padding:4px 0;border-bottom:1px solid var(--border)">${fmt(i)}</li>`).join('');
   }
-  tbody.innerHTML = data.map(p => `
-    <tr>
-      <td><strong>${p.title || 'Untitled'}</strong></td>
-      <td><span class="badge badge-gray">#${p.project_id || p.id}</span></td>
-      <td><span class="badge badge-blue">Owner #${p.owner_id}</span></td>
-      <td>
-        <button class="btn btn-danger" onclick="deleteProject_id(${p.project_id || p.id})">Delete</button>
-      </td>
-    </tr>`).join('');
 }
 
-// ── Render: Items table rows ──
-function renderItems(data, tbodyId) {
-  const tbody = document.getElementById(tbodyId);
-  if (!data || data.length === 0) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="4">No items found</td></tr>';
-    return;
-  }
-  tbody.innerHTML = data.map(i => `
-    <tr>
-      <td><strong>${i.title || i.name || 'Untitled'}</strong></td>
-      <td><span class="badge badge-gray">#${i.item_id || i.id}</span></td>
-      <td><span class="badge badge-green">Project #${i.project_id}</span></td>
-      <td>
-        <button class="btn btn-danger" onclick="deleteItem_id(${i.item_id || i.id})">Delete</button>
-      </td>
-    </tr>`).join('');
+// ── Override showStatus / showError to route to per-tab boxes ──
+const TAB_STATUS = {
+  userList:'userStatus', singleUserResult:'userStatus',
+  projectList:'projectStatus', projectSubset:'projectStatus', singleProjectResult:'projectStatus',
+  itemList:'itemStatus', itemSubset:'itemStatus', singleItemResult:'itemStatus',
+  tagList:'tagStatus', singleTagResult:'tagStatus',
+  itemTagList:'itemTagStatus', itemTagSubset:'itemTagStatus',
+};
+
+function _showBox(id, msg, type) {
+  const box = document.getElementById(id);
+  if (!box) return;
+  box.textContent = msg;
+  box.className = 'status-box ' + type;
+  box.style.display = 'block';
 }
 
-// ── Render: Tags table rows ──
-function renderTags(data, tbodyId) {
-  const tbody = document.getElementById(tbodyId);
-  if (!data || data.length === 0) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="3">No tags found</td></tr>';
-    return;
-  }
-  tbody.innerHTML = data.map(t => `
-    <tr>
-      <td><span class="badge badge-amber">${t.name || t.tag_name}</span></td>
-      <td><span class="badge badge-gray">#${t.tag_id || t.id}</span></td>
-      <td>
-        <button class="btn btn-danger" onclick="deleteTag_id(${t.tag_id || t.id})">Delete</button>
-      </td>
-    </tr>`).join('');
+// find the active tab's status box
+function _activeStatusId() {
+  const active = document.querySelector('.tab-panel.active');
+  if (!active) return 'userStatus';
+  const map = {
+    'tab-users':'userStatus','tab-projects':'projectStatus',
+    'tab-items':'itemStatus','tab-tags':'tagStatus','tab-itemtags':'itemTagStatus'
+  };
+  return map[active.id] || 'userStatus';
 }
 
-// ── Render: Item-Tags table rows ──
-function renderItemTags(data, tbodyId) {
-  const tbody = document.getElementById(tbodyId);
-  if (!data || data.length === 0) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="4">No links found</td></tr>';
-    return;
-  }
-  tbody.innerHTML = data.map(l => `
-    <tr>
-      <td><strong>${l.item_name || ('Item #' + l.item_id)}</strong></td>
-      <td><span class="badge badge-amber">${l.tag_name || ('Tag #' + l.tag_id)}</span></td>
-      <td><span class="badge badge-gray">#${l.item_id}</span></td>
-      <td><span class="badge badge-gray">#${l.tag_id}</span></td>
-    </tr>`).join('');
-}
-
-// ══════════════════════════════════════════════
-//  The functions below keep the SAME names as
-//  your existing script.js so nothing breaks.
-// ══════════════════════════════════════════════
-
-const API = 'http://127.0.0.1:8080';
-
-async function getUsers() {
-  try {
-    const r = await fetch(API + '/users');
-    const d = await r.json();
-    renderUsers(d);
-  } catch(e) { showAlert('user-alert','Could not connect to server.','error'); }
-}
-
-async function getSingleUser() {
-  const id = document.getElementById('getSingleUserId').value;
-  if (!id) { showAlert('user-alert','Please enter a User ID.','error'); return; }
-  try {
-    const r = await fetch(API + '/users/' + id);
-    const d = await r.json();
-    renderUsers(Array.isArray(d) ? d : [d]);
-    showAlert('user-alert','Showing user #' + id + '.','success');
-  } catch(e) { showAlert('user-alert','User not found.','error'); }
-}
-
-async function createUser() {
-  const username = document.getElementById('newUsername').value.trim();
-  const email    = document.getElementById('newEmail').value.trim();
-  if (!username || !email) { showAlert('user-alert','Please fill in both username and email.','error'); return; }
-  try {
-    const r = await fetch(API + '/users', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ username, email })
-    });
-    if (r.ok) {
-      showAlert('user-alert','User "' + username + '" created successfully.','success');
-      document.getElementById('newUsername').value = '';
-      document.getElementById('newEmail').value = '';
-      getUsers();
-    } else { showAlert('user-alert','Failed to create user. Username may already exist.','error'); }
-  } catch(e) { showAlert('user-alert','Connection error.','error'); }
-}
-
-async function updateUser() {
-  const id    = document.getElementById('updateUserId').value;
-  const email = document.getElementById('updateUserEmail').value.trim();
-  if (!id || !email) { showAlert('user-alert','Please enter User ID and new email.','error'); return; }
-  try {
-    const r = await fetch(API + '/users/' + id, {
-      method:'PUT',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ email })
-    });
-    if (r.ok) {
-      showAlert('user-alert','User #' + id + ' updated successfully.','success');
-      document.getElementById('updateUserEmail').value = '';
-      getUsers();
-    } else { showAlert('user-alert','Update failed.','error'); }
-  } catch(e) { showAlert('user-alert','Connection error.','error'); }
-}
-
-async function deleteUser() {
-  const id = document.getElementById('deleteUserId').value;
-  if (!id) return;
-  if (!confirm('Delete user #' + id + '? This cannot be undone.')) return;
-  await deleteUser_id(id);
-}
-async function deleteUser_id(id) {
-  try {
-    await fetch(API + '/users/' + id, { method:'DELETE' });
-    showAlert('user-alert','User #' + id + ' deleted.','success');
-    getUsers();
-  } catch(e) { showAlert('user-alert','Delete failed.','error'); }
-}
-
-// ── Projects ──
-async function getProjects() {
-  try {
-    const r = await fetch(API + '/projects');
-    const d = await r.json();
-    renderProjects(d, 'projectList');
-  } catch(e) { showAlert('project-alert','Could not load projects.','error'); }
-}
-
-async function getProjectsByOwner() {
-  const id = document.getElementById('ownerFilterId').value;
-  if (!id) return;
-  try {
-    const r = await fetch(API + '/projects/owner/' + id);
-    const d = await r.json();
-    const sub = document.getElementById('projectSubset');
-    sub.innerHTML = '<p style="font-size:.8rem;color:#64748b;margin-bottom:6px">Filtered: owner #' + id + '</p>';
-    const tmp = document.createElement('div');
-    tmp.className = 'table-wrap';
-    tmp.innerHTML = '<table><thead><tr><th>Title</th><th>Project ID</th><th>Owner ID</th><th>Action</th></tr></thead><tbody id="projSubTbody"></tbody></table>';
-    sub.appendChild(tmp);
-    renderProjects(Array.isArray(d) ? d : [d], 'projSubTbody');
-  } catch(e) { showAlert('project-alert','Filter failed.','error'); }
-}
-
-async function getSingleProject() {
-  const id = document.getElementById('getSingleProjectId').value;
-  if (!id) return;
-  try {
-    const r = await fetch(API + '/projects/' + id);
-    const d = await r.json();
-    renderProjects(Array.isArray(d) ? d : [d], 'projectList');
-    showAlert('project-alert','Showing project #' + id + '.','success');
-  } catch(e) { showAlert('project-alert','Project not found.','error'); }
-}
-
-async function createProject() {
-  const owner_id = parseInt(document.getElementById('newProjectOwner').value);
-  const title    = document.getElementById('newProjectTitle').value.trim();
-  if (!owner_id || !title) { showAlert('project-alert','Please fill in owner ID and title.','error'); return; }
-  try {
-    const r = await fetch(API + '/projects', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ owner_id, title })
-    });
-    if (r.ok) {
-      showAlert('project-alert','Project "' + title + '" created.','success');
-      document.getElementById('newProjectTitle').value = '';
-      getProjects();
-    } else { showAlert('project-alert','Failed to create project.','error'); }
-  } catch(e) { showAlert('project-alert','Connection error.','error'); }
-}
-
-async function deleteProject() {
-  const id = document.getElementById('deleteProjectId').value;
-  if (!id) return;
-  await deleteProject_id(id);
-}
-async function deleteProject_id(id) {
-  if (!confirm('Delete project #' + id + '?')) return;
-  try {
-    await fetch(API + '/projects/' + id, { method:'DELETE' });
-    showAlert('project-alert','Project #' + id + ' deleted.','success');
-    getProjects();
-  } catch(e) { showAlert('project-alert','Delete failed.','error'); }
-}
-
-// ── Items ──
-async function getItems() {
-  try {
-    const r = await fetch(API + '/items');
-    const d = await r.json();
-    renderItems(d, 'itemList');
-  } catch(e) { showAlert('item-alert','Could not load items.','error'); }
-}
-
-async function getItemsByProject() {
-  const id = document.getElementById('itemProjectFilter').value;
-  if (!id) return;
-  try {
-    const r = await fetch(API + '/items/project/' + id);
-    const d = await r.json();
-    const sub = document.getElementById('itemSubset');
-    sub.innerHTML = '<p style="font-size:.8rem;color:#64748b;margin-bottom:6px">Filtered: project #' + id + '</p>';
-    const tmp = document.createElement('div');
-    tmp.className = 'table-wrap';
-    tmp.innerHTML = '<table><thead><tr><th>Item Name</th><th>Item ID</th><th>Project ID</th><th>Action</th></tr></thead><tbody id="itemSubTbody"></tbody></table>';
-    sub.appendChild(tmp);
-    renderItems(Array.isArray(d) ? d : [d], 'itemSubTbody');
-  } catch(e) { showAlert('item-alert','Filter failed.','error'); }
-}
-
-async function getSingleItem() {
-  const id = document.getElementById('getSingleItemId').value;
-  if (!id) return;
-  try {
-    const r = await fetch(API + '/items/' + id);
-    const d = await r.json();
-    renderItems(Array.isArray(d) ? d : [d], 'itemList');
-    showAlert('item-alert','Showing item #' + id + '.','success');
-  } catch(e) { showAlert('item-alert','Item not found.','error'); }
-}
-
-async function createItem() {
-  const project_id = parseInt(document.getElementById('newItemProject').value);
-  const name       = document.getElementById('newItemName').value.trim();
-  if (!project_id || !name) { showAlert('item-alert','Please fill in project ID and item name.','error'); return; }
-  try {
-    const r = await fetch(API + '/items', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ project_id, title: name })
-    });
-    if (r.ok) {
-      showAlert('item-alert','Item "' + name + '" added.','success');
-      document.getElementById('newItemName').value = '';
-      getItems();
-    } else { showAlert('item-alert','Failed to add item.','error'); }
-  } catch(e) { showAlert('item-alert','Connection error.','error'); }
-}
-
-async function deleteItem() {
-  const id = document.getElementById('deleteItemId').value;
-  if (!id) return;
-  await deleteItem_id(id);
-}
-async function deleteItem_id(id) {
-  if (!confirm('Delete item #' + id + '?')) return;
-  try {
-    await fetch(API + '/items/' + id, { method:'DELETE' });
-    showAlert('item-alert','Item #' + id + ' deleted.','success');
-    getItems();
-  } catch(e) { showAlert('item-alert','Delete failed.','error'); }
-}
-
-// ── Tags ──
-async function getTags() {
-  try {
-    const r = await fetch(API + '/tags');
-    const d = await r.json();
-    renderTags(d, 'tagList');
-  } catch(e) { showAlert('tag-alert','Could not load tags.','error'); }
-}
-
-async function getSingleTag() {
-  const id = document.getElementById('getSingleTagId').value;
-  if (!id) return;
-  try {
-    const r = await fetch(API + '/tags/' + id);
-    const d = await r.json();
-    renderTags(Array.isArray(d) ? d : [d], 'tagList');
-    showAlert('tag-alert','Showing tag #' + id + '.','success');
-  } catch(e) { showAlert('tag-alert','Tag not found.','error'); }
-}
-
-async function createTag() {
-  const name = document.getElementById('newTagName').value.trim();
-  if (!name) { showAlert('tag-alert','Please enter a tag name.','error'); return; }
-  try {
-    const r = await fetch(API + '/tags', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ name })
-    });
-    if (r.ok) {
-      showAlert('tag-alert','Tag "' + name + '" created.','success');
-      document.getElementById('newTagName').value = '';
-      getTags();
-    } else { showAlert('tag-alert','Failed to create tag.','error'); }
-  } catch(e) { showAlert('tag-alert','Connection error.','error'); }
-}
-
-async function deleteTag() {
-  const id = document.getElementById('deleteTagId').value;
-  if (!id) return;
-  await deleteTag_id(id);
-}
-async function deleteTag_id(id) {
-  if (!confirm('Delete tag #' + id + '?')) return;
-  try {
-    await fetch(API + '/tags/' + id, { method:'DELETE' });
-    showAlert('tag-alert','Tag #' + id + ' deleted.','success');
-    getTags();
-  } catch(e) { showAlert('tag-alert','Delete failed.','error'); }
-}
-
-// ── Item Tags ──
-async function getItemTags() {
-  try {
-    const r = await fetch(API + '/item_tags');
-    const d = await r.json();
-    renderItemTags(d, 'itemTagList');
-  } catch(e) { showAlert('itemtag-alert','Could not load item–tag links.','error'); }
-}
-
-async function getTagsForItem() {
-  const id = document.getElementById('itemTagFilter').value;
-  if (!id) return;
-  try {
-    const r = await fetch(API + '/item_tags/' + id);
-    const d = await r.json();
-    const sub = document.getElementById('itemTagSubset');
-    sub.innerHTML = '<p style="font-size:.8rem;color:#64748b;margin-bottom:6px">Filtered: item #' + id + '</p>';
-    const tmp = document.createElement('div');
-    tmp.className = 'table-wrap';
-    tmp.innerHTML = '<table><thead><tr><th>Item Name</th><th>Tag Name</th><th>Item ID</th><th>Tag ID</th></tr></thead><tbody id="itemTagSubTbody"></tbody></table>';
-    sub.appendChild(tmp);
-    renderItemTags(Array.isArray(d) ? d : [d], 'itemTagSubTbody');
-  } catch(e) { showAlert('itemtag-alert','Filter failed.','error'); }
-}
-
-async function addItemTag() {
-  const item_id = parseInt(document.getElementById('linkItemId').value);
-  const tag_id  = parseInt(document.getElementById('linkTagId').value);
-  if (!item_id || !tag_id) { showAlert('itemtag-alert','Please enter both Item ID and Tag ID.','error'); return; }
-  try {
-    const r = await fetch(API + '/item_tags', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ item_id, tag_id })
-    });
-    if (r.ok) {
-      showAlert('itemtag-alert','Tag #' + tag_id + ' linked to item #' + item_id + '.','success');
-      document.getElementById('linkItemId').value = '';
-      document.getElementById('linkTagId').value = '';
-      getItemTags();
-    } else { showAlert('itemtag-alert','Link failed. It may already exist.','error'); }
-  } catch(e) { showAlert('itemtag-alert','Connection error.','error'); }
-}
-
-async function removeItemTag() {
-  const item_id = document.getElementById('unlinkItemId').value;
-  const tag_id  = document.getElementById('unlinkTagId').value;
-  if (!item_id || !tag_id) { showAlert('itemtag-alert','Please enter both Item ID and Tag ID.','error'); return; }
-  if (!confirm('Remove link between item #' + item_id + ' and tag #' + tag_id + '?')) return;
-  try {
-    await fetch(API + '/item_tags/' + item_id + '/' + tag_id, { method:'DELETE' });
-    showAlert('itemtag-alert','Link removed successfully.','success');
-    document.getElementById('unlinkItemId').value = '';
-    document.getElementById('unlinkTagId').value = '';
-    getItemTags();
-  } catch(e) { showAlert('itemtag-alert','Delete failed.','error'); }
-}
+function showStatus(msg) { _showBox(_activeStatusId(), msg, 'success'); }
+function showError(msg)  { _showBox(_activeStatusId(), msg, 'error');   }
 </script>
 </body>
 </html>
